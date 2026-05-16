@@ -1,0 +1,10 @@
+﻿<Window x:Class="AutoPartsShop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Magazin Piese Auto" Height="760" Width="1200"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Frame Name="MainFrame" NavigationUIVisibility="Hidden" />
+    </Grid>
+</Window>
