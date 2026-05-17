@@ -26,24 +26,24 @@
                     <TextBlock Text="Auto" Foreground="#3182CE" FontSize="28" FontWeight="Bold" Margin="5,0,0,0"/>
                 </StackPanel>
 
-                <TextBlock Text="Creează un cont nou de client" Foreground="#718096" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,25"/>
+                <TextBlock Text="Crează un cont nou de client" Foreground="#718096" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,25"/>
 
-                <TextBlock Text="Nume Complet" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,6"/>
+                <TextBlock x:Name="NumeTextBox" Text="Nume Complet" Foreground="#4A5568" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,6"/>
                 <Border Background="#F7FAFC" CornerRadius="8" BorderThickness="1" BorderBrush="#E2E8F0" Padding="10,8" Margin="0,0,0,15">
                     <TextBox BorderThickness="0" Background="Transparent" FontSize="15" Foreground="#2D3748"/>
                 </Border>
 
                 <TextBlock Text="Adresă Email" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,6"/>
                 <Border Background="#F7FAFC" CornerRadius="8" BorderThickness="1" BorderBrush="#E2E8F0" Padding="10,8" Margin="0,0,0,15">
-                    <TextBox BorderThickness="0" Background="Transparent" FontSize="15" Foreground="#2D3748"/>
+                    <TextBox x:Name="EmailTextBox" BorderThickness="0" Background="Transparent" FontSize="15" Foreground="#2D3748"/>
                 </Border>
 
-                <TextBlock Text="Parolă" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,6"/>
+                <TextBlock x:Name="ParolaBox" Text="Parolă" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,6"/>
                 <Border Background="#F7FAFC" CornerRadius="8" BorderThickness="1" BorderBrush="#E2E8F0" Padding="10,8" Margin="0,0,0,25">
                     <PasswordBox BorderThickness="0" Background="Transparent" FontSize="15"/>
                 </Border>
 
-                <Button Content="Creează Contul" Background="#38A169" Foreground="White" FontSize="16" FontWeight="Bold" Height="45" Cursor="Hand">
+                <Button Click="CreareCont_Click" x:Name="Click__CreareCont_Click_" Content="Crează Contul" Background="#38A169" Foreground="White" FontSize="16" FontWeight="Bold" Height="45" Cursor="Hand">
                     <Button.Resources>
                         <Style TargetType="Button">
                             <Setter Property="Template">

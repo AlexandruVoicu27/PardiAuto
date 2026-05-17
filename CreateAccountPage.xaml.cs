@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,5 +32,88 @@ namespace AutoPartsShop
         {
             NavigationService.GetNavigationService(this).Navigate(new LoginPage());
         }
+        private void CreareCont_Click(object sender, RoutedEventArgs e)
+        {
+            string nume = NumeTextBox.Text;
+            string email = EmailTextBox.Text;
+            string parola = ParolaBox.Text;
+
+            email=EmailTextBox.Text.Trim(); //elimina spatiile albe de la inceput si sfarsit
+
+            if (string.IsNullOrWhiteSpace(nume) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(parola))
+            {
+                MessageBox.Show("Te rog să completezi toate câmpurile!", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; 
+            }
+
+            // 2. Verificam formatul de email cu Regex
+            string emailPattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            
+            if (!Regex.IsMatch(email, emailPattern))
+            {
+                MessageBox.Show("Adresa de email nu este validă! Trebuie să conțină '@' și un domeniu.", "Eroare Email", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            
+            //si adaugam in DB
+
+            SalvareInBazaDeDate(nume, email, HashParola(parola));
+            //TREBUIE ADAUGAT SA MA BAGE PE SITE AUTOMAT
+        }
+
+        private void SalvareInBazaDeDate(string nume, string email, string parolaHash)
+        {
+            string connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open(); 
+
+                    // Folosim parametri (@Nume, etc.) ca să prevenim atacurile de tip SQL Injection
+                    string query = "INSERT INTO Utilizatori (NumeComplet, Email, ParolaHash) VALUES (@Nume, @Email, @Parola)";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Nume", nume);
+                        cmd.Parameters.AddWithValue("@Email", email);
+                        cmd.Parameters.AddWithValue("@Parola", parolaHash);
+
+                        cmd.ExecuteNonQuery(); 
+
+                        MessageBox.Show("Cont creat cu succes! Te poți autentifica acum.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        NavigationService.GetNavigationService(this).Navigate(new LoginPage());
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 2627) // cod specific pentru duplicate din MSSQL
+                    {
+                        MessageBox.Show("Există deja un cont cu acest email!", "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Eroare la conectarea cu baza de date: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private string HashParola(string parola)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(parola));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2")); //transforma fiecare byte in hexazecimal
+                }
+                return builder.ToString();
+            }
+        }
     }
+
 }
