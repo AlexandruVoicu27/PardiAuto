@@ -30,15 +30,15 @@
 
                 <TextBlock Text="Utilizator / Email" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,8"/>
                 <Border Background="#F7FAFC" CornerRadius="8" BorderThickness="1" BorderBrush="#E2E8F0" Padding="10,8" Margin="0,0,0,20">
-                    <TextBox BorderThickness="0" Background="Transparent" FontSize="15" Foreground="#2D3748" Text="admin@autoparts.ro"/>
+                    <TextBox x:Name="Username_Mail_BOX" BorderThickness="0" Background="Transparent" FontSize="15" Foreground="#2D3748" />
                 </Border>
 
                 <TextBlock Text="Parolă" Foreground="#4A5568" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,8"/>
                 <Border Background="#F7FAFC" CornerRadius="8" BorderThickness="1" BorderBrush="#E2E8F0" Padding="10,8" Margin="0,0,0,30">
-                    <PasswordBox BorderThickness="0" Background="Transparent" FontSize="15"/>
+                    <PasswordBox x:Name="Parola_Login_BOX" BorderThickness="0" Background="Transparent" FontSize="15"/>
                 </Border>
 
-                <Button Content="Conectare" Background="#3182CE" Foreground="White" FontSize="16" FontWeight="Bold" Height="45" Cursor="Hand" Margin="0,10,0,0">
+                <Button Click="Conectare_Click" x:Name="Click_Conectare" Content="Conectare" Background="#3182CE" Foreground="White" FontSize="16" FontWeight="Bold" Height="45" Cursor="Hand" Margin="0,10,0,0">
                     <Button.Resources>
                         <Style TargetType="Button">
                             <Setter Property="Template">
@@ -71,7 +71,7 @@
                 </Style.Triggers>
             </Style>
         </Hyperlink.Style>
-        Nu ai cont? Creează un cont nou.
+        Nu ai cont? Crează un cont nou.
     </Hyperlink>
                 </TextBlock>
             </StackPanel>

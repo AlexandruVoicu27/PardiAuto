@@ -1,10 +1,54 @@
 ﻿<Window x:Class="AutoPartsShop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Magazin Piese Auto" Height="760" Width="1200"
-        WindowStartupLocation="CenterScreen">
+        Title="Pardi Auto - Dashboard" Height="760" Width="1200"
+        WindowStartupLocation="CenterScreen" Background="#F7FAFC">
 
     <Grid>
-        <Frame Name="MainFrame" NavigationUIVisibility="Hidden" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#1A202C">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="80"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock FontSize="32" FontWeight="ExtraBold" HorizontalAlignment="Center">
+                <Run Text="Pardi" Foreground="White"/>
+                <Run Text="Auto" Foreground="#3182CE"/>
+                    </TextBlock>
+                    <TextBlock Text="Piese și Accesorii" Foreground="#A0AEC0" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Margin="10,20,10,0">
+                    <Button Content="🏠 Acasă" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Height="45" HorizontalContentAlignment="Left" Padding="20,0,0,0" Cursor="Hand"/>
+                    <Button Content="⚙️ Piese Auto"  Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Height="45" HorizontalContentAlignment="Left" Padding="20,0,0,0" Cursor="Hand" Margin="0,5,0,0"/>
+                    <Button Content="🛒 Coșul Meu"  Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Height="45" HorizontalContentAlignment="Left" Padding="20,0,0,0" Cursor="Hand" Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <Button x:Name="BtnDeconectare" Grid.Row="2" Content="🚪 Deconectare" Background="#E53E3E" Foreground="White" BorderThickness="0" FontSize="15" FontWeight="SemiBold" Height="40" Margin="20" Cursor="Hand"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="White" BorderThickness="0,0,0,1" BorderBrush="#E2E8F0">
+                <Grid>
+                    <TextBlock Text="Panou de Control" VerticalAlignment="Center" Margin="30,0,0,0" FontSize="20" FontWeight="SemiBold" Foreground="#2D3748"/>
+                    <TextBlock x:Name="UserSalutText" Text="Salut" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="868,24,0,0" FontSize="16" FontWeight="Medium" Foreground="#4A5568"/>
+                </Grid>
+            </Border>
+
+            <Frame Grid.Row="1" Name="MainFrame" NavigationUIVisibility="Hidden" Background="#F7FAFC" Margin="10"/>
+        </Grid>
     </Grid>
 </Window>

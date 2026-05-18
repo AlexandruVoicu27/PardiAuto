@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,7 +37,7 @@ namespace AutoPartsShop
         {
             string nume = NumeTextBox.Text;
             string email = EmailTextBox.Text;
-            string parola = ParolaBox.Text;
+            string parola = ParolaBox.Password;
 
             email=EmailTextBox.Text.Trim(); //elimina spatiile albe de la inceput si sfarsit
 
@@ -57,7 +58,7 @@ namespace AutoPartsShop
             
             //si adaugam in DB
 
-            SalvareInBazaDeDate(nume, email, HashParola(parola));
+            SalvareInBazaDeDate(nume, email, Security.HashParola(parola));
             //TREBUIE ADAUGAT SA MA BAGE PE SITE AUTOMAT
         }
 
@@ -101,19 +102,6 @@ namespace AutoPartsShop
             }
         }
 
-        private string HashParola(string parola)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(parola));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2")); //transforma fiecare byte in hexazecimal
-                }
-                return builder.ToString();
-            }
-        }
     }
 
 }

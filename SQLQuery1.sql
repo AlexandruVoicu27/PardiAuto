@@ -1,0 +1,7 @@
+﻿CREATE TABLE Utilizatori (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    NumeComplet NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    ParolaHash NVARCHAR(255) NOT NULL,
+    Rol NVARCHAR(20) DEFAULT 'Client'
+);
