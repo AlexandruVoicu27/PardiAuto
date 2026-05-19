@@ -8,10 +8,12 @@ namespace AutoPartsShop
 {
     public class Utilizator
     {
+   
         public int ID { get; private set; }
         public string Nume { get; private set; }
         public string Email { get; private set; }
         public RolUtilizator Rol { get; private set; }
+
 
         public Utilizator(int id,string nume, string email, RolUtilizator rol)
         {
@@ -19,6 +21,18 @@ namespace AutoPartsShop
             Nume = nume;
             Email = email;
             Rol = rol;
+        }
+
+        //aici se stabilesc ce tip de utilizator se va crea in functie de rolul primit ca parametru
+
+        public static Utilizator CreateByRol(int id, string nume, string email, RolUtilizator rol)
+        {
+            return rol switch
+            {
+                RolUtilizator.Administrator => new ADMIN(id, nume, email),
+                RolUtilizator.Angajat => new ANGAJAT(id, nume, email),
+                RolUtilizator.Client => new CLIENT(id, nume, email),
+            };
         }
     }
 }

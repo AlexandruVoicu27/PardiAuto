@@ -1,0 +1,139 @@
+﻿<Page x:Class="AutoPartsShop.ProfilUtilizator"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1000"
+      Title="UserProfilePage">
+
+    <Page.Resources>
+        <Style x:Key="TabButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#4A5568"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="ActiveTabButton" TargetType="Button" BasedOn="{StaticResource TabButton}">
+            <Setter Property="Background" Value="#3182CE"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#3182CE"/>
+        </Style>
+
+        <Style x:Key="DataRowBorder" TargetType="Border">
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="#EDF2F7">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,0">
+            <Button Content="📝 Date personale" Style="{StaticResource ActiveTabButton}"/>
+            <Button x:Name="ConfigurareAngajati" Content="👥 Configurare angajați" Style="{StaticResource TabButton}"/>
+            <Button Content="🔒 Schimbă parolă" Style="{StaticResource TabButton}"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Margin="20" Padding="20">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+
+                    <TextBlock Text="Date personale" FontSize="18" FontWeight="Bold" Foreground="#3182CE" Margin="0,0,0,20"/>
+
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Cod client / ID:" Foreground="#4A5568" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtId" Grid.Column="1" Foreground="#1A202C" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Adresă email:" Foreground="#4A5568" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtEmail" Grid.Column="1" Foreground="#1A202C" VerticalAlignment="Center"/>
+                            <Button Grid.Column="2" Content="✏️" Width="30" Height="25" Background="#E2E8F0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Nume:" Foreground="#4A5568" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtNume" Grid.Column="1"  Foreground="#1A202C" VerticalAlignment="Center"/>
+                            <Button Grid.Column="2" Content="✏️" Width="30" Height="25" Background="#E2E8F0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Rol în sistem:" Foreground="#4A5568" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtRol" Grid.Column="1"  Foreground="#1A202C" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Adresa de livrare implicită:" Foreground="#4A5568" VerticalAlignment="Center"/>
+
+                            <TextBlock x:Name="TxtAdresa" Grid.Column="1"  TextWrapping="Wrap" Foreground="#1A202C" VerticalAlignment="Center"/>
+
+                            <Button x:Name="AdresaLivrareEdit" Click="AdresaLivrareEdit_Click" Grid.Column="2" Content="✏️" Width="30" Height="25" Background="#E2E8F0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource DataRowBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Număr telefon mobil:" Foreground="#4A5568" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtTelefon" Grid.Column="1"  Foreground="#1A202C" VerticalAlignment="Center"/>
+                            <Button x:Name="EditNrTelefon" Click="EditNrTelefon_Click" Grid.Column="2" Content="✏️" Width="30" Height="25" Background="#E2E8F0" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+                    </Border>
+
+                  
+
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Page>

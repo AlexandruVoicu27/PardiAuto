@@ -73,13 +73,14 @@ namespace AutoPartsShop
                     conn.Open(); 
 
                     // Folosim parametri (@Nume, etc.) ca să prevenim atacurile de tip SQL Injection
-                    string query = "INSERT INTO Utilizatori (NumeComplet, Email, ParolaHash) VALUES (@Nume, @Email, @Parola)";
+                    string query = "INSERT INTO Utilizatori (NumeComplet, Email, ParolaHash,Rol) VALUES (@Nume, @Email, @Parola, @Rol)";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@Nume", nume);
                         cmd.Parameters.AddWithValue("@Email", email);
                         cmd.Parameters.AddWithValue("@Parola", parolaHash);
+                        cmd.Parameters.AddWithValue("@Rol", RolUtilizator.Client.ToString());
 
                         cmd.ExecuteNonQuery(); 
 

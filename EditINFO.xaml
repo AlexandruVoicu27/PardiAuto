@@ -1,0 +1,19 @@
+﻿<Window x:Class="AutoPartsShop.EditINFO"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editare Date" Height="250" Width="450" 
+        WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" ResizeMode="NoResize">
+
+    <Grid Background="#F7FAFC" Margin="20">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock x:Name="LblMesaj" Text="Introdu noua valoare:" FontSize="16" FontWeight="SemiBold" Foreground="#2D3748" Margin="0,0,0,15"/>
+
+            <TextBox x:Name="TxtInput" FontSize="16" Padding="10" Background="White" BorderBrush="#E2E8F0" BorderThickness="1"  Margin="0,0,0,25"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Anulare" Width="100" Height="35" Background="White" Foreground="#4A5568" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,0,10,0" Click="BtnCancel_Click" Cursor="Hand"/>
+                <Button Content="Salvare" Width="100" Height="35" Background="#3182CE" Foreground="White" BorderThickness="0" Click="BtnSave_Click" Cursor="Hand"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -21,7 +21,7 @@ namespace AutoPartsShop
         public MainWindow()
         {
             InitializeComponent();
-            MainFrame.Navigated += MainFrame_Navigated; 
+            MainFrame.Navigated += MainFrame_Navigated;
             // Aplicatia porneste direct cu pagina de Login
             MainFrame.Navigate(new LoginPage());
         }
@@ -30,22 +30,56 @@ namespace AutoPartsShop
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
+
         }
 
-        private void MainFrame_Navigated(object sender,NavigationEventArgs e) //functie sa nu am butonul de deconectare vizibil cand sunt pe pagina de login sau creare cont
+        public void SetUtilizatorCurent(Utilizator utilizator)
         {
-            if (MainFrame.Content is LoginPage || MainFrame.Content is CreateAccountPage ||  MainFrame.Content == null )
+            utilizatorCurent = utilizator;
+            UserSalutText.Text = $"Salut, {utilizatorCurent.Nume}!";
+            MainFrame.Navigate(new MainPage());
+        }
+
+        private void MainFrame_Navigated(object sender, NavigationEventArgs e) //functie sa nu am butonul de deconectare vizibil cand sunt pe pagina de login sau creare cont
+        {
+            if (MainFrame.Content is LoginPage || MainFrame.Content is CreateAccountPage || MainFrame.Content == null)
             {
                 BtnDeconectare.Visibility = Visibility.Collapsed;
+                UserSalutText.Visibility = Visibility.Collapsed;
+                ProfilUtilizator.Visibility = Visibility.Collapsed;
+
             }
             else
             {
                 BtnDeconectare.Visibility = Visibility.Visible;
+                UserSalutText.Visibility = Visibility.Visible;
+                ProfilUtilizator.Visibility = Visibility.Visible;
             }
         }
+           
+        private void BtnDeconectare_Click(object sender, RoutedEventArgs e)
+        {
+            // Navigam inapoi la pagina de login
+            MainFrame.Navigate(new LoginPage());
+        }
+
+        private void BtnAcasa_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new MainPage());
+        }
+
+        private void ProfilUtilizator_Click(object sender, RoutedEventArgs e)
+        {
+            if (utilizatorCurent == null)
+            {
+                MessageBox.Show("Trebuie să fii autentificat pentru a vedea profilul.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MainFrame.Navigate(new ProfilUtilizator(utilizatorCurent));
 
 
+        }
 
     }
-
 }
