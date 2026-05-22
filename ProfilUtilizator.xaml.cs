@@ -1,5 +1,7 @@
 ﻿using System;
+using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +22,8 @@ namespace AutoPartsShop
     /// </summary>
     public partial class ProfilUtilizator : Page
     {
+        private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
+
         private Utilizator utilizatorCurent;
 
         public ProfilUtilizator(Utilizator utilizator)
@@ -31,6 +35,7 @@ namespace AutoPartsShop
             TxtNume.Text = utilizator.Nume;
             TxtEmail.Text = utilizator.Email;
             TxtRol.Text = $" {utilizator.Rol}";
+            IncarcaDateContact();
 
             if (utilizatorCurent.Rol != RolUtilizator.Administrator)
             {
@@ -41,12 +46,12 @@ namespace AutoPartsShop
         private void EditNrTelefon_Click(object sender, RoutedEventArgs e)
         {
             EditINFO dialog = new EditINFO("Număr de Telefon", TxtTelefon.Text);
-
+            
+           
             if (dialog.ShowDialog() == true)
             {
                 TxtTelefon.Text = dialog.ValoareIntrodusa;
-
-                //aici trb sa dau update si in baza de date;
+                SalveazaDateContact();
             }
         }
 
@@ -57,9 +62,95 @@ namespace AutoPartsShop
             if (dialog.ShowDialog() == true)
             {
                 TxtAdresa.Text = dialog.ValoareIntrodusa;
-
-                //tot pt baza de date trb aici
+                SalveazaDateContact();
             }
         }
+
+        private void IncarcaDateContact()
+        {
+            try
+            {
+                AsiguraDateContact();
+
+                using SqlConnection conn = new SqlConnection(ConnectionString);
+                conn.Open();
+
+                string query = "SELECT NumarTelefon, Adresa FROM DateUtilizatori WHERE UtilizatorId = @UtilizatorId";
+
+                using SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UtilizatorId", utilizatorCurent.ID);
+
+                using SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    TxtTelefon.Text = reader["NumarTelefon"].ToString();
+                    TxtAdresa.Text = reader["Adresa"].ToString();
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Eroare la încărcarea datelor de contact: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void SalveazaDateContact()
+        {
+            try
+            {
+                AsiguraDateContact();
+
+                using SqlConnection conn = new SqlConnection(ConnectionString);
+                conn.Open();
+
+                string query = @"
+            IF EXISTS (SELECT 1 FROM DateUtilizatori WHERE UtilizatorId = @UtilizatorId)
+            BEGIN
+                UPDATE DateUtilizatori
+                SET NumarTelefon = @NumarTelefon,
+                    Adresa = @Adresa
+                WHERE UtilizatorId = @UtilizatorId
+            END
+            ELSE
+            BEGIN
+                INSERT INTO DateUtilizatori (UtilizatorId, NumarTelefon, Adresa)
+                VALUES (@UtilizatorId, @NumarTelefon, @Adresa)
+            END";
+
+                using SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@UtilizatorId", utilizatorCurent.ID);
+                cmd.Parameters.AddWithValue("@NumarTelefon",TxtTelefon.Text);
+                cmd.Parameters.AddWithValue("@Adresa", TxtAdresa.Text);
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Eroare la salvarea datelor de contact: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void AsiguraDateContact()
+        {
+            using SqlConnection conn = new SqlConnection(ConnectionString);
+            conn.Open();
+
+            string query = @"
+            IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'DateUtilizatori') BEGIN
+            CREATE TABLE DateUtilizatori (
+                Id INT IDENTITY(1,1) PRIMARY KEY,
+                UtilizatorId INT NOT NULL UNIQUE,
+                NumarTelefon NVARCHAR(30) NULL,
+                Adresa NVARCHAR(500) NULL,
+                CONSTRAINT FK_DateUtilizatori_Utilizatori
+                    FOREIGN KEY (UtilizatorId) REFERENCES Utilizatori(Id)
+                    ON DELETE CASCADE
+            );
+        END";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
+        }
+
     }
 }

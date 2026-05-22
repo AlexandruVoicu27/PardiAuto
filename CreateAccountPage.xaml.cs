@@ -82,7 +82,7 @@ namespace AutoPartsShop
                         cmd.Parameters.AddWithValue("@Parola", parolaHash);
                         cmd.Parameters.AddWithValue("@Rol", RolUtilizator.Client.ToString());
 
-                        cmd.ExecuteNonQuery(); 
+                        cmd.ExecuteNonQuery(); //folosesc functia asta pentru audit mai incolo
 
                         MessageBox.Show("Cont creat cu succes! Te poți autentifica acum.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
 
