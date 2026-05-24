@@ -15,3 +15,34 @@ CREATE TABLE DateUtilizatori (
         FOREIGN KEY (UtilizatorId) REFERENCES Utilizatori(Id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE Produs (
+    ID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+    Nume NVARCHAR(100) NOT NULL,
+    Descriere NVARCHAR(500) NULL,
+    Categorie NVARCHAR(50) NOT NULL,
+    Pret DECIMAL(10, 2) NOT NULL,
+    Cantitate INT NOT NULL,
+    CONSTRAINT CK_Produs_Cantitate CHECK (Cantitate >= 0)
+);
+
+CREATE TABLE Comanda (
+    ID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+    ID_Utilizator INT NOT NULL,
+    DataComanda DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    Status NVARCHAR(20) NOT NULL DEFAULT 'InCos',
+    CONSTRAINT FK_Comanda_Utilizatori
+        FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(Id)
+);
+
+CREATE TABLE ComandaProduse (
+    ID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+    ID_Comanda UNIQUEIDENTIFIER NOT NULL,
+    ID_Produs UNIQUEIDENTIFIER NOT NULL,
+    Cantitate INT NOT NULL,
+    CONSTRAINT FK_ComandaProduse_Comanda
+        FOREIGN KEY (ID_Comanda) REFERENCES Comanda(ID),
+    CONSTRAINT FK_ComandaProduse_Produs
+        FOREIGN KEY (ID_Produs) REFERENCES Produs(ID),
+    CONSTRAINT CK_ComandaProduse_Cantitate CHECK (Cantitate > 0)
+);

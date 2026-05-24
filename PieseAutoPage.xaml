@@ -1,0 +1,202 @@
+<Page x:Class="AutoPartsShop.PieseAutoPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="760" d:DesignWidth="980"
+      Title="PieseAutoPage" Background="#F7FAFC" FontFamily="Segoe UI">
+
+    <Page.Resources>
+        <Style x:Key="InputBox" TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderBrush" Value="#CBD5E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,4,0,12"/>
+        </Style>
+
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock x:Name="TxtTitluPagina" Text="Produse" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
+                <TextBlock x:Name="TxtDescrierePagina" Text="Alege categoria si filtrele potrivite." FontSize="14" Foreground="#718096" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <Button Grid.Column="1" Content="Reîncarcă" Click="BtnReincarca_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#F7FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="Filtrare produse" FontSize="16" FontWeight="Bold" Foreground="#2D3748" Margin="0,0,0,10"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="Cauta dupa nume sau descriere" Foreground="#4A5568"/>
+                                    <TextBox x:Name="TxtCautaProdus" TextChanged="Filtru_TextChanged" Style="{StaticResource InputBox}" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Text="Pret minim" Foreground="#4A5568"/>
+                                    <TextBox x:Name="TxtPretMinim" TextChanged="Filtru_TextChanged" Style="{StaticResource InputBox}" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                    <TextBlock Text="Pret maxim" Foreground="#4A5568"/>
+                                    <TextBox x:Name="TxtPretMaxim" TextChanged="Filtru_TextChanged" Style="{StaticResource InputBox}" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                                    <TextBlock Text="Categorie" Foreground="#4A5568"/>
+                                    <ComboBox x:Name="CmbCategorieFiltru" SelectedIndex="0" SelectionChanged="Filtru_SelectionChanged" Height="36" Margin="0,4,0,0" Padding="8,5">
+                                        <ComboBoxItem Content="Toate"/>
+                                        <ComboBoxItem Content="Piese Auto"/>
+                                        <ComboBoxItem Content="Uleiuri &amp; Fluide"/>
+                                        <ComboBoxItem Content="Filtre Auto"/>
+                                        <ComboBoxItem Content="Sistem Frânare"/>
+                                        <ComboBoxItem Content="Suspensie &amp; Direcție"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Stoc" Foreground="#4A5568"/>
+                                    <ComboBox x:Name="CmbStoc" SelectedIndex="0" SelectionChanged="Filtru_SelectionChanged" Height="36" Margin="0,4,0,0" Padding="8,5">
+                                        <ComboBoxItem Content="Toate"/>
+                                        <ComboBoxItem Content="Doar pe stoc"/>
+                                        <ComboBoxItem Content="Stoc epuizat"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Sortare" Foreground="#4A5568" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox x:Name="CmbSortare" SelectedIndex="0" SelectionChanged="Filtru_SelectionChanged" Width="170" Height="34" Padding="8,4">
+                                        <ComboBoxItem Content="Nume A-Z"/>
+                                        <ComboBoxItem Content="Pret crescator"/>
+                                        <ComboBoxItem Content="Pret descrescator"/>
+                                        <ComboBoxItem Content="Stoc descrescator"/>
+                                    </ComboBox>
+                                    <TextBlock x:Name="TxtNumarProduse" Foreground="#718096" VerticalAlignment="Center" Margin="16,0,0,0"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1" Content="Filtreaza" Click="BtnFiltreaza_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                                <Button Grid.Column="2" Content="Reseteaza" Click="BtnReseteazaFiltre_Click" Style="{StaticResource ActionButton}" Background="#718096" Foreground="White" Margin="0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid x:Name="ProduseGrid"
+                          Grid.Row="1"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          SelectionChanged="IncarcaDetaliiProdus"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          RowHeaderWidth="0"
+                          CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Produs" Binding="{Binding Nume}" Width="2*"/>
+                        <DataGridTextColumn Header="Categorie" Binding="{Binding Categorie}" Width="120"/>
+                        <DataGridTextColumn Header="Preț" Binding="{Binding Pret, StringFormat={}{0:0.00} lei}" Width="100"/>
+                        <DataGridTextColumn Header="Stoc" Binding="{Binding Cantitate}" Width="80"/>
+                        <DataGridTextColumn Header="Descriere" Binding="{Binding Descriere}" Width="2*"/>
+                    </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                <Border x:Name="PanouAdministrare" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Administrare produs" FontSize="18" FontWeight="Bold" Foreground="#2D3748" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Nume" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtNumeProdus" Style="{StaticResource InputBox}"/>
+
+                        <TextBlock Text="Preț" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtPretProdus" Style="{StaticResource InputBox}"/>
+
+                        <TextBlock Text="Cantitate stoc" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtCantitateProdus" Style="{StaticResource InputBox}"/>
+
+                        <TextBlock Text="Categorie" Foreground="#4A5568"/>
+                        <ComboBox x:Name="CmbCategorieProdus" SelectedIndex="0" Height="36" Margin="0,4,0,12" Padding="8,5">
+                            <ComboBoxItem Content="Piese Auto"/>
+                            <ComboBoxItem Content="Uleiuri &amp; Fluide"/>
+                            <ComboBoxItem Content="Filtre Auto"/>
+                            <ComboBoxItem Content="Sistem Frânare"/>
+                            <ComboBoxItem Content="Suspensie &amp; Direcție"/>
+                        </ComboBox>
+
+                        <TextBlock Text="Descriere" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtDescriereProdus" Style="{StaticResource InputBox}" AcceptsReturn="True" Height="80" TextWrapping="Wrap"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Adaugă" Click="BtnAdauga_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                            <Button Content="Actualizează" Click="BtnActualizeaza_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                            <Button Content="Șterge" Click="BtnSterge_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="PanouCumparare" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="Cumpărare" FontSize="18" FontWeight="Bold" Foreground="#2D3748" Margin="0,0,0,12"/>
+                        <TextBlock Text="Cantitate" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtCantitateCumparare" Text="1" Style="{StaticResource InputBox}"/>
+                        <Button Content="Cumpără produsul selectat" Click="BtnCumpara_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

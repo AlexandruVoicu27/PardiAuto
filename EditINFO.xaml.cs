@@ -37,7 +37,7 @@ namespace AutoPartsShop
         {
             if(this.Title == "Număr de Telefon")
             {
-                if(TxtInput.Text.Length != 10 && TxtInput.Text.All(char.IsDigit)==false)
+                if(TxtInput.Text.Length != 10 || TxtInput.Text.All(char.IsDigit)==false)
                 {
                     MessageBox.Show("Numărul de telefon trebuie să conțină exact 10 cifre!", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;

@@ -1,0 +1,59 @@
+<Page x:Class="AutoPartsShop.ConfigurareAngajatiPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="760" d:DesignWidth="980"
+      Title="ConfigurareAngajatiPage" Background="#F7FAFC" FontFamily="Segoe UI">
+
+    <Page.Resources>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Configurare angajati" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12">
+            <DataGrid x:Name="UtilizatoriGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      RowHeaderWidth="0"
+                      CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="70"/>
+                    <DataGridTextColumn Header="Nume" Binding="{Binding Nume}" Width="2*"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*"/>
+                    <DataGridTextColumn Header="Rol" Binding="{Binding Rol}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Promoveaza la angajat" Click="BtnPromoveazaAngajat_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                <Button x:Name="BtnPromoveazaAdministrator" Content="Promoveaza la administrator" Click="BtnPromoveazaAdministrator_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                <Button Content="Transforma in client" Click="BtnTransformaClient_Click" Style="{StaticResource ActionButton}" Background="#718096" Foreground="White"/>
+                <Button Content="Reincarca" Click="BtnReincarcaUtilizatori_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

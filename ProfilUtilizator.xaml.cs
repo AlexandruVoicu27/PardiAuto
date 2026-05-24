@@ -37,12 +37,22 @@ namespace AutoPartsShop
             TxtRol.Text = $" {utilizator.Rol}";
             IncarcaDateContact();
 
-            if (utilizatorCurent.Rol != RolUtilizator.Administrator)
+            if (utilizatorCurent.Rol != RolUtilizator.Administrator && utilizatorCurent.Rol != RolUtilizator.Angajat)
             {
                 ConfigurareAngajati.Visibility = Visibility.Collapsed;
-            }   
+            }
          
         }
+
+        private void BtnDatePersonale_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void ConfigurareAngajati_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new ConfigurareAngajatiPage(utilizatorCurent));
+        }
+
         private void EditNrTelefon_Click(object sender, RoutedEventArgs e)
         {
             EditINFO dialog = new EditINFO("Număr de Telefon", TxtTelefon.Text);
@@ -70,7 +80,6 @@ namespace AutoPartsShop
         {
             try
             {
-                AsiguraDateContact();
 
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
@@ -98,7 +107,6 @@ namespace AutoPartsShop
         {
             try
             {
-                AsiguraDateContact();
 
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
@@ -123,6 +131,7 @@ namespace AutoPartsShop
                 cmd.Parameters.AddWithValue("@Adresa", TxtAdresa.Text);
 
                 cmd.ExecuteNonQuery();
+                AppLogger.Scrie("Date profil salvate", "Utilizator: " + utilizatorCurent.Email + ", telefon: " + TxtTelefon.Text + ", adresa: " + TxtAdresa.Text);
             }
             catch (SqlException ex)
             {
@@ -130,27 +139,6 @@ namespace AutoPartsShop
             }
         }
 
-        private void AsiguraDateContact()
-        {
-            using SqlConnection conn = new SqlConnection(ConnectionString);
-            conn.Open();
-
-            string query = @"
-            IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'DateUtilizatori') BEGIN
-            CREATE TABLE DateUtilizatori (
-                Id INT IDENTITY(1,1) PRIMARY KEY,
-                UtilizatorId INT NOT NULL UNIQUE,
-                NumarTelefon NVARCHAR(30) NULL,
-                Adresa NVARCHAR(500) NULL,
-                CONSTRAINT FK_DateUtilizatori_Utilizatori
-                    FOREIGN KEY (UtilizatorId) REFERENCES Utilizatori(Id)
-                    ON DELETE CASCADE
-            );
-        END";
-
-            using SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.ExecuteNonQuery();
-        }
-
+       
     }
 }

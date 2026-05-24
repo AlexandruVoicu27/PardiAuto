@@ -37,16 +37,19 @@ namespace AutoPartsShop
         {
             utilizatorCurent = utilizator;
             UserSalutText.Text = $"Salut, {utilizatorCurent.Nume}!";
-            MainFrame.Navigate(new MainPage());
+            MainFrame.Navigate(new MainPage(utilizatorCurent));
         }
 
-        private void MainFrame_Navigated(object sender, NavigationEventArgs e) //functie sa nu am butonul de deconectare vizibil cand sunt pe pagina de login sau creare cont
+        private void MainFrame_Navigated(object sender, NavigationEventArgs e) //functie sa nu am buton vizibil cand sunt pe pagina de login sau creare cont
         {
-            if (MainFrame.Content is LoginPage || MainFrame.Content is CreateAccountPage || MainFrame.Content == null)
+            if (MainFrame.Content is LoginPage || MainFrame.Content is CreateAccountPage)
             {
                 BtnDeconectare.Visibility = Visibility.Collapsed;
                 UserSalutText.Visibility = Visibility.Collapsed;
                 ProfilUtilizator.Visibility = Visibility.Collapsed;
+                BtnAcasa.Visibility = Visibility.Collapsed;
+                BtnPieseAuto.Visibility = Visibility.Collapsed;
+                BtnComandaMea.Visibility = Visibility.Collapsed;
 
             }
             else
@@ -54,6 +57,9 @@ namespace AutoPartsShop
                 BtnDeconectare.Visibility = Visibility.Visible;
                 UserSalutText.Visibility = Visibility.Visible;
                 ProfilUtilizator.Visibility = Visibility.Visible;
+                BtnAcasa.Visibility = Visibility.Visible;
+                BtnPieseAuto.Visibility = Visibility.Visible;
+                BtnComandaMea.Visibility = Visibility.Visible;
             }
         }
            
@@ -65,19 +71,24 @@ namespace AutoPartsShop
 
         private void BtnAcasa_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new MainPage());
+            MainFrame.Navigate(new MainPage(utilizatorCurent));
+        }
+
+        private void BtnPieseAuto_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new PieseAutoPage(utilizatorCurent, "Toate"));
+        }
+
+        private void BtnComandaMea_Click(object sender, RoutedEventArgs e)
+        {
+            
+            MainFrame.Navigate(new ComandaMeaPage(utilizatorCurent));
         }
 
         private void ProfilUtilizator_Click(object sender, RoutedEventArgs e)
         {
-            if (utilizatorCurent == null)
-            {
-                MessageBox.Show("Trebuie să fii autentificat pentru a vedea profilul.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
+           
             MainFrame.Navigate(new ProfilUtilizator(utilizatorCurent));
-
 
         }
 

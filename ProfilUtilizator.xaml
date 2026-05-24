@@ -42,9 +42,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,0">
-            <Button Content="📝 Date personale" Style="{StaticResource ActiveTabButton}"/>
-            <Button x:Name="ConfigurareAngajati" Content="👥 Configurare angajați" Style="{StaticResource TabButton}"/>
-            <Button Content="🔒 Schimbă parolă" Style="{StaticResource TabButton}"/>
+            <Button x:Name="BtnDatePersonale" Click="BtnDatePersonale_Click" Content="📝 Date personale" Style="{StaticResource ActiveTabButton}"/>
+            <Button x:Name="ConfigurareAngajati" Click="ConfigurareAngajati_Click" Content="👥 Configurare angajați" Style="{StaticResource TabButton}"/>
         </StackPanel>
 
         <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Margin="20" Padding="20">
@@ -129,8 +128,6 @@
                             <Button x:Name="EditNrTelefon" Click="EditNrTelefon_Click" Grid.Column="2" Content="✏️" Width="30" Height="25" Background="#E2E8F0" BorderThickness="0" Cursor="Hand"/>
                         </Grid>
                     </Border>
-
-                  
 
                 </StackPanel>
             </ScrollViewer>

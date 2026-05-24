@@ -31,7 +31,6 @@
 
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="Găsește piesele potrivite pentru mașina ta!" Foreground="White" FontSize="26" FontWeight="Bold"/>
-                            <TextBlock Text="Peste 50.000 de piese auto și accesorii pe stoc, cu livrare rapidă." Foreground="#EBF8FF" FontSize="14" Margin="0,8,0,0"/>
                         </StackPanel>
 
                         <TextBlock Grid.Column="1" Text="🚗" FontSize="60" VerticalAlignment="Center" Margin="20,0,0,0"/>
@@ -61,7 +60,7 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <Button x:Name="BtnCauta" Grid.Column="1" Content="🔍 Caută" Background="#1A202C" Foreground="White" FontSize="16" FontWeight="SemiBold" Cursor="Hand" BorderThickness="0">
+                    <Button x:Name="BtnCauta" Grid.Column="1" Content="🔍 Caută" Click="BtnCauta_Click" Background="#1A202C" Foreground="White" FontSize="16" FontWeight="SemiBold" Cursor="Hand" BorderThickness="0">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border Background="{TemplateBinding Background}" CornerRadius="0,8,8,0">
@@ -75,28 +74,28 @@
                 <TextBlock Text="Categorii Populare" FontSize="22" FontWeight="Bold" Foreground="#2D3748" Margin="0,0,0,15"/>
 
                 <WrapPanel Margin="-10">
-                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
+                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand" MouseLeftButtonUp="Uleiuri_Click">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="🛢️" FontSize="36" HorizontalAlignment="Center"/>
                             <TextBlock Text="Uleiuri &amp; Fluide" FontSize="16" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,10,0,0" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
+                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand" MouseLeftButtonUp="FiltreAuto_Click">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="🌪️" FontSize="36" HorizontalAlignment="Center"/>
                             <TextBlock Text="Filtre Auto" FontSize="16" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,10,0,0" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
+                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand" MouseLeftButtonUp="SistemFranare_Click">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="🛑" FontSize="36" HorizontalAlignment="Center"/>
                             <TextBlock Text="Sistem Frânare" FontSize="16" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,10,0,0" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand">
+                    <Border Background="White" Width="200" Height="120" CornerRadius="10" Margin="10" BorderBrush="#E2E8F0" BorderThickness="1" Cursor="Hand" MouseLeftButtonUp="SuspensieDirectie_Click">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="⚙️" FontSize="36" HorizontalAlignment="Center"/>
                             <TextBlock Text="Suspensie &amp; Direcție" FontSize="16" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,10,0,0" HorizontalAlignment="Center"/>

@@ -83,6 +83,7 @@ namespace AutoPartsShop
                         cmd.Parameters.AddWithValue("@Rol", RolUtilizator.Client.ToString());
 
                         cmd.ExecuteNonQuery(); //folosesc functia asta pentru audit mai incolo
+                        AppLogger.Scrie("Cont creat", "Nume: " + nume + ", email: " + email + ", rol: " + RolUtilizator.Client);
 
                         MessageBox.Show("Cont creat cu succes! Te poți autentifica acum.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
 

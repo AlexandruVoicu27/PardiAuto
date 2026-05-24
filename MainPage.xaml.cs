@@ -20,9 +20,37 @@ namespace AutoPartsShop
     /// </summary>
     public partial class MainPage : Page
     {
-        public MainPage()
+        private Utilizator utilizatorCurent;
+
+        public MainPage(Utilizator utilizator)
         {
             InitializeComponent();
+            utilizatorCurent = utilizator;
+        }
+
+        private void BtnCauta_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new PieseAutoPage(utilizatorCurent, "", SearchBox.Text.Trim()));
+        }
+
+        private void Uleiuri_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new PieseAutoPage(utilizatorCurent, "Uleiuri & Fluide"));
+        }
+
+        private void FiltreAuto_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new PieseAutoPage(utilizatorCurent, "Filtre Auto"));
+        }
+
+        private void SistemFranare_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new PieseAutoPage(utilizatorCurent, "Sistem Frânare"));
+        }
+
+        private void SuspensieDirectie_Click(object sender, MouseButtonEventArgs e)
+        {
+            NavigationService.Navigate(new PieseAutoPage(utilizatorCurent, "Suspensie & Direcție"));
         }
     }
 }
