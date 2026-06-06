@@ -26,7 +26,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Configurare angajati" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
+            <TextBlock Text="Administrare utilizatori" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
+            <TextBlock Text="CRUD utilizatori: creare cont, editare date, schimbare rol si stergere." FontSize="14" Foreground="#718096"/>
         </StackPanel>
 
         <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12">
@@ -34,6 +35,7 @@
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       SelectionMode="Single"
+                      SelectionChanged="UtilizatoriGrid_SelectionChanged"
                       HeadersVisibility="Column"
                       GridLinesVisibility="Horizontal"
                       RowHeaderWidth="0"
@@ -48,11 +50,45 @@
         </Border>
 
         <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,16,0,0">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Promoveaza la angajat" Click="BtnPromoveazaAngajat_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
-                <Button x:Name="BtnPromoveazaAdministrator" Content="Promoveaza la administrator" Click="BtnPromoveazaAdministrator_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
-                <Button Content="Transforma in client" Click="BtnTransformaClient_Click" Style="{StaticResource ActionButton}" Background="#718096" Foreground="White"/>
-                <Button Content="Reincarca" Click="BtnReincarcaUtilizatori_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White"/>
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1.3*"/>
+                        <ColumnDefinition Width="1.3*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Nume complet" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtNume" Height="34"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                        <TextBlock Text="Email" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtEmail" Height="34"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                        <TextBlock Text="Parola noua" Foreground="#4A5568"/>
+                        <PasswordBox x:Name="TxtParola" Height="34"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3">
+                        <TextBlock Text="Rol" Foreground="#4A5568"/>
+                        <ComboBox x:Name="CmbRol" Height="34">
+                            <ComboBoxItem Content="Client"/>
+                            <ComboBoxItem Content="Angajat"/>
+                            <ComboBoxItem Content="Administrator"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <WrapPanel>
+                    <Button Content="Creeaza utilizator" Click="BtnCreeazaUtilizator_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                    <Button Content="Actualizeaza utilizator" Click="BtnActualizeazaUtilizator_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                    <Button Content="Sterge utilizator" Click="BtnStergeUtilizator_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
+                    <Button Content="Promoveaza la angajat" Click="BtnPromoveazaAngajat_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                    <Button x:Name="BtnPromoveazaAdministrator" Content="Promoveaza la administrator" Click="BtnPromoveazaAdministrator_Click" Style="{StaticResource ActionButton}" Background="#805AD5" Foreground="White"/>
+                    <Button Content="Transforma in client" Click="BtnTransformaClient_Click" Style="{StaticResource ActionButton}" Background="#718096" Foreground="White"/>
+                    <Button Content="Reincarca" Click="BtnReincarcaUtilizatori_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White"/>
+                </WrapPanel>
             </StackPanel>
         </Border>
     </Grid>
