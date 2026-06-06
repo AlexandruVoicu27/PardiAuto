@@ -16,7 +16,7 @@ namespace AutoPartsShop
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
-            AsiguraStatusComanda();
+            DbSchema.AsiguraSchema();
             IncarcaComenzi();
         }
 
@@ -45,10 +45,17 @@ namespace AutoPartsShop
                 conn.Open();
 
                 string query = @"
-            UPDATE Comanda
-            SET Status = 'Finalizata'
-            WHERE ID_Utilizator = @ID_Utilizator
-              AND Status = 'InCos'";
+UPDATE c
+SET Status = 'Finalizata',
+    Total = ISNULL((
+        SELECT SUM(cp.Cantitate * p.Pret)
+        FROM ComandaProduse cp
+        INNER JOIN Produs p ON cp.ID_Produs = p.ID
+        WHERE cp.ID_Comanda = c.ID
+    ), 0)
+FROM Comanda c
+WHERE c.ID_Utilizator = @ID_Utilizator
+  AND c.Status = 'InCos'";
 
                 using SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@ID_Utilizator", utilizatorCurent.ID);
@@ -56,7 +63,7 @@ namespace AutoPartsShop
                 int randuri = cmd.ExecuteNonQuery();
 
                 AppLogger.Scrie("Comanda finalizata", "Utilizator: " + utilizatorCurent.Email + ", comenzi finalizate: " + randuri);
-                MessageBox.Show("Comanda a fost finalizata.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Comanda a fost finalizata. Un angajat poate genera factura si inregistra plata.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
                 IncarcaComenzi();
             }
             catch (SqlException ex)
@@ -125,29 +132,6 @@ namespace AutoPartsShop
             ComenziGrid.ItemsSource = comenzi;
             TxtNumarProduse.Text = "Produse cumparate: " + comenzi.Count;
             TxtTotalComenzi.Text = "Total: " + total.ToString("0.00") + " lei";
-        }
-
-        private void AsiguraStatusComanda()
-        {
-            try
-            {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = @"
-            IF COL_LENGTH('Comanda', 'Status') IS NULL
-            BEGIN
-                ALTER TABLE Comanda
-                ADD Status NVARCHAR(20) NOT NULL CONSTRAINT DF_Comanda_Status DEFAULT 'InCos'
-            END";
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la verificarea comenzilor: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private bool AreAdresaLivrare()
