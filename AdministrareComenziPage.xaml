@@ -1,0 +1,102 @@
+<Page x:Class="AutoPartsShop.AdministrareComenziPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignHeight="760" d:DesignWidth="980"
+      Title="AdministrareComenziPage" Background="#F7FAFC" FontFamily="Segoe UI">
+
+    <Page.Resources>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Administrare comenzi" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
+                <TextBlock Text="CRUD comenzi: creare, actualizare status, stergere si generare factura." FontSize="14" Foreground="#718096"/>
+            </StackPanel>
+            <Button Grid.Column="1" Content="Reincarca" Click="BtnReincarca_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="12">
+            <DataGrid x:Name="ComenziGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      SelectionChanged="ComenziGrid_SelectionChanged"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      RowHeaderWidth="0"
+                      CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="160"/>
+                    <DataGridTextColumn Header="Client" Binding="{Binding Client}" Width="160"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="190"/>
+                    <DataGridTextColumn Header="Data" Binding="{Binding DataComanda, StringFormat={}{0:dd.MM.yyyy HH:mm}}" Width="135"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="110"/>
+                    <DataGridTextColumn Header="Produse" Binding="{Binding NumarProduse}" Width="70"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}{0:0.00} lei}" Width="110"/>
+                    <DataGridCheckBoxColumn Header="Factura" Binding="{Binding AreFactura}" Width="70"/>
+                    <DataGridTextColumn Header="Observatii" Binding="{Binding Observatii}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,16,0,0">
+            <StackPanel>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="Client" Foreground="#4A5568"/>
+                        <ComboBox x:Name="CmbUtilizatori" Height="34" DisplayMemberPath="Afisare" SelectedValuePath="ID"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                        <TextBlock Text="Status" Foreground="#4A5568"/>
+                        <ComboBox x:Name="CmbStatus" Height="34">
+                            <ComboBoxItem Content="InCos"/>
+                            <ComboBoxItem Content="Finalizata"/>
+                            <ComboBoxItem Content="InProcesare"/>
+                            <ComboBoxItem Content="Livrata"/>
+                            <ComboBoxItem Content="Anulata"/>
+                            <ComboBoxItem Content="Achitata"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Observatii" Foreground="#4A5568"/>
+                        <TextBox x:Name="TxtObservatii" Height="34"/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Creeaza comanda" Click="BtnCreeaza_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                    <Button Content="Actualizeaza" Click="BtnActualizeaza_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                    <Button Content="Sterge" Click="BtnSterge_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
+                    <Button Content="Genereaza factura" Click="BtnGenereazaFactura_Click" Style="{StaticResource ActionButton}" Background="#805AD5" Foreground="White"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
