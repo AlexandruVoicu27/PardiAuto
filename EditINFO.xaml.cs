@@ -14,9 +14,6 @@ using System.Windows.Shapes;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for EditINFO.xaml
-    /// </summary>
     public partial class EditINFO : Window
     {
         public string ValoareIntrodusa { get; private set; }
@@ -33,6 +30,7 @@ namespace AutoPartsShop
             TxtInput.SelectAll();
         }
 
+        // functie care doar verifica daca numarul de telefon are vreo sansa sa existe pe lumea asta
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             if(this.Title == "Număr de Telefon")
@@ -48,6 +46,7 @@ namespace AutoPartsShop
             this.DialogResult = true;
         }
 
+        // Inchide fara salvarea modificarilor.
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;

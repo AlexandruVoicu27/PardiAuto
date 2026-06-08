@@ -10,8 +10,8 @@ namespace AutoPartsShop
         public string Categorie { get; set; } 
         public decimal Pret { get; set; }
         public int Cantitate { get; set; }
-    
-    public Produs(Guid id, string nume, string descriere, string categorie, decimal pret, int cantitate)
+
+        public Produs(Guid id, string nume, string descriere, string categorie, decimal pret, int cantitate)
         {
             ID = id;
             Nume = nume;

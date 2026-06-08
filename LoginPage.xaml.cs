@@ -17,21 +17,21 @@ using System.Windows.Shapes;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for LoginPage.xaml
-    /// </summary>
     public partial class LoginPage : Page
     {
+        // Initializeaza formularul de autentificare.
         public LoginPage()
         {
             InitializeComponent();
         }
 
+        // Deschide pagina de creare a unui cont nou.
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GetNavigationService(this).Navigate(new CreateAccountPage());
         }
 
+        // Valideaza campurile, hash-uieste parola si porneste verificarea in baza de date.
         private void Conectare_Click(object sender, RoutedEventArgs e)
         {
             string username_email = Username_Mail_BOX.Text.Trim();
@@ -46,6 +46,8 @@ namespace AutoPartsShop
             string parola_introdusa = Security.HashParola(parola);
             VerificareInBazaDeDate(username_email, parola_introdusa);
         }
+
+        // Cauta utilizatorul dupa nume sau email si initializeaza sesiunea daca parola corespunde.
         private void VerificareInBazaDeDate(string username_email, string parola_introdusa)
         {
             string connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";

@@ -4,9 +4,7 @@ using System.Windows.Navigation;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    
     public partial class MainWindow : Window
     {
         private Utilizator? utilizatorCurent;
@@ -41,6 +39,8 @@ namespace AutoPartsShop
             }
         }
 
+        // Ascunde meniul pe paginile de autentificare si il reconfigureaza dupa navigare.
+        
         private void MainFrame_Navigated(object sender, NavigationEventArgs e)
         {
             if (MainFrame.Content is LoginPage || MainFrame.Content is CreateAccountPage)
@@ -50,7 +50,6 @@ namespace AutoPartsShop
                 ProfilUtilizator.Visibility = Visibility.Collapsed;
                 BtnAcasa.Visibility = Visibility.Collapsed;
                 BtnDashboardAdmin.Visibility = Visibility.Collapsed;
-                BtnAdminUtilizatori.Visibility = Visibility.Collapsed;
                 BtnAdminComenzi.Visibility = Visibility.Collapsed;
                 BtnPlatiFacturi.Visibility = Visibility.Collapsed;
                 BtnPieseAuto.Visibility = Visibility.Collapsed;
@@ -65,6 +64,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Afiseaza numai butoanele permise administratorului, angajatului sau clientului.
         private void ConfigureazaMeniuDupaRol()
         {
             if (utilizatorCurent == null)
@@ -81,17 +81,19 @@ namespace AutoPartsShop
             BtnComandaMea.Visibility = esteClient ? Visibility.Visible : Visibility.Collapsed;
 
             BtnDashboardAdmin.Visibility = esteAdmin ? Visibility.Visible : Visibility.Collapsed;
-            BtnAdminUtilizatori.Visibility = esteAdmin ? Visibility.Visible : Visibility.Collapsed;
             BtnAdminComenzi.Visibility = esteStaff ? Visibility.Visible : Visibility.Collapsed;
             BtnPlatiFacturi.Visibility = esteStaff ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        // Incheie sesiunea curenta si revine la autentificare.
         private void BtnDeconectare_Click(object sender, RoutedEventArgs e)
         {
             utilizatorCurent = null;
             MainFrame.Navigate(new LoginPage());
         }
 
+        
+        // Deschide dashboardul administratorului sau pagina principala a celorlalte roluri.
         private void BtnAcasa_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent == null)
@@ -110,6 +112,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la dashboardul administratorului.
         private void BtnDashboardAdmin_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -118,6 +121,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la administrarea utilizatorilor.
         private void BtnAdminUtilizatori_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -126,6 +130,7 @@ namespace AutoPartsShop
             }
         }
 
+       // Navigheaza la administrarea comenzilor.
         private void BtnAdminComenzi_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -134,6 +139,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la pagina de plati si facturi.
         private void BtnPlatiFacturi_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -142,6 +148,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la catalogul complet de piese auto.
         private void BtnPieseAuto_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -150,6 +157,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la cosul/comanda clientului.
         private void BtnComandaMea_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)
@@ -158,6 +166,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Navigheaza la profilul utilizatorului autentificat.
         private void ProfilUtilizator_Click(object sender, RoutedEventArgs e)
         {
             if (utilizatorCurent != null)

@@ -1,98 +1,78 @@
 using Microsoft.Data.SqlClient;
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace AutoPartsShop
 {
+    // Permite personalului sa consulte, actualizeze, factureze si sa stearga comenzile.
     public partial class AdministrareComenziPage : Page
     {
         private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
         private readonly Utilizator utilizatorCurent;
-        private readonly List<AdminComanda> comenzi = new List<AdminComanda>();
-        private readonly List<UtilizatorSelect> utilizatori = new List<UtilizatorSelect>();
 
+        private ComboBox ComboStatus => (ComboBox)FindName("CmbStatus");
+
+        // Configureaza statusurile disponibile, sincronizeaza datele vechi si incarca comenzile.
         public AdministrareComenziPage(Utilizator utilizator)
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
-            DbSchema.AsiguraSchema();
-            CmbStatus.SelectedIndex = 0;
-            IncarcaUtilizatori();
+            ComboStatus.ItemsSource = GestionareComanda.Statusuri;
+            ComboStatus.SelectedItem = GestionareComanda.Finalizata;
+            GestionareComanda.SincronizeazaDateExistente();
             IncarcaComenzi();
         }
 
+        // Reciteste comenzile din baza de date.
         private void BtnReincarca_Click(object sender, RoutedEventArgs e)
         {
-            IncarcaUtilizatori();
             IncarcaComenzi();
         }
 
-        private void BtnCreeaza_Click(object sender, RoutedEventArgs e)
-        {
-            if (CmbUtilizatori.SelectedValue == null)
-            {
-                MessageBox.Show("Selecteaza clientul pentru comanda.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            try
-            {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = @"
-INSERT INTO Comanda (ID, ID_Utilizator, Status, Total, Observatii)
-VALUES (@ID, @ID_Utilizator, @Status, 0, @Observatii)";
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@ID", Guid.NewGuid());
-                cmd.Parameters.AddWithValue("@ID_Utilizator", Convert.ToInt32(CmbUtilizatori.SelectedValue));
-                cmd.Parameters.AddWithValue("@Status", TextComboBox(CmbStatus));
-                cmd.Parameters.AddWithValue("@Observatii", TxtObservatii.Text.Trim());
-                cmd.ExecuteNonQuery();
-
-                AppLogger.Scrie("Comanda creata", "Utilizator: " + utilizatorCurent.Email);
-                IncarcaComenzi();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la crearea comenzii: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
+        // Salveaza observatiile si statusul comenzii selectate.
+        // Statusul este trimis si catre factura si platile asociate.
         private void BtnActualizeaza_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaComanda(out AdminComanda comanda))
+            if (!SelecteazaComanda(out DataRowView comanda))
             {
                 return;
             }
 
             try
             {
+                Guid idComanda = (Guid)comanda["ID"];
+
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
+                using SqlTransaction transaction = conn.BeginTransaction();
 
+                // Totalul este recalculat din produsele comenzii, pentru a nu ramane
+                // o valoare veche daca preturile sau cantitatile au fost modificate.
                 string query = @"
 UPDATE Comanda
-SET Status = @Status,
-    Observatii = @Observatii,
+SET Observatii = @Observatii,
     Total = ISNULL((
         SELECT SUM(cp.Cantitate * p.Pret)
         FROM ComandaProduse cp
         INNER JOIN Produs p ON cp.ID_Produs = p.ID
         WHERE cp.ID_Comanda = @ID
-    ), 0)
+), 0)
 WHERE ID = @ID";
 
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@ID", comanda.ID);
-                cmd.Parameters.AddWithValue("@Status", TextComboBox(CmbStatus));
+                using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+                cmd.Parameters.AddWithValue("@ID", idComanda);
                 cmd.Parameters.AddWithValue("@Observatii", TxtObservatii.Text.Trim());
                 cmd.ExecuteNonQuery();
 
-                AppLogger.Scrie("Comanda actualizata", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + comanda.ID);
+                string status = CitesteStatusSelectat();
+                GestionareComanda.SincronizeazaStatus(conn, transaction, idComanda, status);
+
+                // Observatiile, totalul si statusurile sunt confirmate ca o singura operatie.
+                transaction.Commit();
+
+                AppLogger.Scrie("Comanda actualizata", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + idComanda);
                 IncarcaComenzi();
             }
             catch (SqlException ex)
@@ -103,7 +83,7 @@ WHERE ID = @ID";
 
         private void BtnSterge_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaComanda(out AdminComanda comanda))
+            if (!SelecteazaComanda(out DataRowView comanda))
             {
                 return;
             }
@@ -115,18 +95,36 @@ WHERE ID = @ID";
 
             try
             {
+                Guid idComanda = (Guid)comanda["ID"];
+
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
                 using SqlTransaction transaction = conn.BeginTransaction();
 
-                Executa(conn, transaction, "DELETE FROM Plati WHERE ID_Comanda = @ID", comanda.ID);
-                Executa(conn, transaction, "DELETE FROM Facturi WHERE ID_Comanda = @ID", comanda.ID);
-                Executa(conn, transaction, "DELETE FROM ComandaProduse WHERE ID_Comanda = @ID", comanda.ID);
-                Executa(conn, transaction, "DELETE FROM Comanda WHERE ID = @ID", comanda.ID);
+                using SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.Transaction = transaction;
+                cmd.Parameters.AddWithValue("@ID", idComanda);
+
+                // Stergem platile
+                cmd.CommandText = "DELETE FROM Plati WHERE ID_Comanda = @ID";
+                cmd.ExecuteNonQuery();
+
+                // Stergem facturile
+                cmd.CommandText = "DELETE FROM Facturi WHERE ID_Comanda = @ID";
+                cmd.ExecuteNonQuery();
+
+                // Stergem legaturile cu produsele
+                cmd.CommandText = "DELETE FROM ComandaProduse WHERE ID_Comanda = @ID";
+                cmd.ExecuteNonQuery();
+
+                // La final, stergem comanda in sine
+                cmd.CommandText = "DELETE FROM Comanda WHERE ID = @ID";
+                cmd.ExecuteNonQuery();
 
                 transaction.Commit();
 
-                AppLogger.Scrie("Comanda stearsa", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + comanda.ID);
+                AppLogger.Scrie("Comanda stearsa", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + idComanda);
                 IncarcaComenzi();
             }
             catch (SqlException ex)
@@ -135,14 +133,18 @@ WHERE ID = @ID";
             }
         }
 
+        // Genereaza factura pentru comanda selectata, daca aceasta contine produse.
         private void BtnGenereazaFactura_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaComanda(out AdminComanda comanda))
+            if (!SelecteazaComanda(out DataRowView comanda))
             {
                 return;
             }
 
-            if (comanda.NumarProduse == 0)
+            Guid idComanda = (Guid)comanda["ID"];
+            int numarProduse = Convert.ToInt32(comanda["NumarProduse"]);
+
+            if (numarProduse == 0)
             {
                 MessageBox.Show("Nu poti genera factura pentru o comanda fara produse.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -150,8 +152,8 @@ WHERE ID = @ID";
 
             try
             {
-                GenereazaFactura(comanda.ID);
-                AppLogger.Scrie("Factura generata", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + comanda.ID);
+                GestionareComanda.GenereazaFactura(idComanda);
+                AppLogger.Scrie("Factura generata", "Utilizator: " + utilizatorCurent.Email + ", comanda: " + idComanda);
                 IncarcaComenzi();
                 MessageBox.Show("Factura a fost generata sau era deja existenta.", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -161,96 +163,55 @@ WHERE ID = @ID";
             }
         }
 
+        // Copiaza statusul si observatiile comenzii selectate in formularul de editare.
         private void ComenziGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ComenziGrid.SelectedItem is not AdminComanda comanda)
+            if (ComenziGrid.SelectedItem is not DataRowView comanda)
             {
                 return;
             }
 
-            TxtObservatii.Text = comanda.Observatii;
-            SeteazaStatus(comanda.Status);
-            CmbUtilizatori.SelectedValue = comanda.IDUtilizator;
-        }
+            TxtObservatii.Text = comanda["Observatii"].ToString();
+            ComboStatus.SelectedItem = comanda["Status"].ToString();
 
-        private void IncarcaUtilizatori()
-        {
-            utilizatori.Clear();
-
-            try
+            if (ComboStatus.SelectedIndex < 0)
             {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = "SELECT Id, NumeComplet, Email FROM Utilizatori ORDER BY NumeComplet";
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    int id = Convert.ToInt32(reader["Id"]);
-                    string nume = Convert.ToString(reader["NumeComplet"]) ?? "";
-                    string email = Convert.ToString(reader["Email"]) ?? "";
-                    utilizatori.Add(new UtilizatorSelect(id, nume + " (" + email + ")"));
-                }
-
-                CmbUtilizatori.ItemsSource = null;
-                CmbUtilizatori.ItemsSource = utilizatori;
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la incarcarea utilizatorilor: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComboStatus.SelectedItem = GestionareComanda.Finalizata;
             }
         }
 
+        // Citeste comenzile direct intr-un DataTable.
         private void IncarcaComenzi()
         {
-            comenzi.Clear();
-
             try
             {
                 using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
 
                 string query = @"
 SELECT c.ID,
-       c.ID_Utilizator,
-       u.NumeComplet,
+       u.NumeComplet AS Client,
        u.Email,
        c.DataComanda,
        c.Status,
        ISNULL(NULLIF(c.Total, 0), ISNULL(SUM(cp.Cantitate * p.Pret), 0)) AS Total,
        COUNT(cp.ID) AS NumarProduse,
        ISNULL(c.Observatii, '') AS Observatii,
-       CASE WHEN MAX(CASE WHEN f.ID IS NULL THEN 0 ELSE 1 END) = 1 THEN 1 ELSE 0 END AS AreFactura
+       CAST(CASE WHEN MAX(CASE WHEN f.ID IS NULL THEN 0 ELSE 1 END) = 1 THEN 1 ELSE 0 END AS BIT) AS AreFactura
 FROM Comanda c
 INNER JOIN Utilizatori u ON c.ID_Utilizator = u.Id
 LEFT JOIN ComandaProduse cp ON c.ID = cp.ID_Comanda
 LEFT JOIN Produs p ON cp.ID_Produs = p.ID
 LEFT JOIN Facturi f ON c.ID = f.ID_Comanda
-GROUP BY c.ID, c.ID_Utilizator, u.NumeComplet, u.Email, c.DataComanda, c.Status, c.Total, c.Observatii
+GROUP BY c.ID, u.NumeComplet, u.Email, c.DataComanda, c.Status, c.Total, c.Observatii
 ORDER BY c.DataComanda DESC";
 
                 using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataAdapter adapter = new SqlDataAdapter(cmd);
 
-                while (reader.Read())
-                {
-                    comenzi.Add(new AdminComanda(
-                        (Guid)reader["ID"],
-                        Convert.ToInt32(reader["ID_Utilizator"]),
-                        Convert.ToString(reader["NumeComplet"]) ?? "",
-                        Convert.ToString(reader["Email"]) ?? "",
-                        Convert.ToDateTime(reader["DataComanda"]),
-                        Convert.ToString(reader["Status"]) ?? "",
-                        Convert.ToDecimal(reader["Total"]),
-                        Convert.ToInt32(reader["NumarProduse"]),
-                        Convert.ToString(reader["Observatii"]) ?? "",
-                        Convert.ToInt32(reader["AreFactura"]) == 1));
-                }
+                DataTable tabelComenzi = new DataTable();
+                adapter.Fill(tabelComenzi);
 
-                ComenziGrid.ItemsSource = null;
-                ComenziGrid.ItemsSource = comenzi;
+                ComenziGrid.ItemsSource = tabelComenzi.DefaultView;
             }
             catch (SqlException ex)
             {
@@ -258,94 +219,29 @@ ORDER BY c.DataComanda DESC";
             }
         }
 
-        private void GenereazaFactura(Guid comandaId)
+        // Returneaza comanda selectata (ca rand din tabel) sau afiseaza un mesaj daca nu exista selectie.
+        private bool SelecteazaComanda(out DataRowView comanda)
         {
-            using SqlConnection conn = new SqlConnection(ConnectionString);
-            conn.Open();
-            using SqlTransaction transaction = conn.BeginTransaction();
-
-            string updateTotal = @"
-UPDATE Comanda
-SET Total = ISNULL((
-    SELECT SUM(cp.Cantitate * p.Pret)
-    FROM ComandaProduse cp
-    INNER JOIN Produs p ON cp.ID_Produs = p.ID
-    WHERE cp.ID_Comanda = @ID
-), 0)
-WHERE ID = @ID";
-            Executa(conn, transaction, updateTotal, comandaId);
-
-            string insertFactura = @"
-IF NOT EXISTS (SELECT 1 FROM Facturi WHERE ID_Comanda = @ID)
-BEGIN
-    INSERT INTO Facturi (ID_Comanda, NumarFactura, Total, Status)
-    SELECT ID, @NumarFactura, Total, 'Emisa'
-    FROM Comanda
-    WHERE ID = @ID
-END";
-
-            using SqlCommand cmd = new SqlCommand(insertFactura, conn, transaction);
-            cmd.Parameters.AddWithValue("@ID", comandaId);
-            cmd.Parameters.AddWithValue("@NumarFactura", "FA-" + DateTime.Now.ToString("yyyyMMddHHmmss"));
-            cmd.ExecuteNonQuery();
-
-            transaction.Commit();
-        }
-
-        private void Executa(SqlConnection conn, SqlTransaction transaction, string query, Guid id)
-        {
-            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
-            cmd.Parameters.AddWithValue("@ID", id);
-            cmd.ExecuteNonQuery();
-        }
-
-        private bool SelecteazaComanda(out AdminComanda comanda)
-        {
-            if (ComenziGrid.SelectedItem is AdminComanda comandaSelectata)
+            if (ComenziGrid.SelectedItem is DataRowView comandaSelectata)
             {
                 comanda = comandaSelectata;
                 return true;
             }
 
-            comanda = new AdminComanda(Guid.Empty, 0, "", "", DateTime.Now, "", 0, 0, "", false);
+            comanda = null;
             MessageBox.Show("Selecteaza o comanda.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             return false;
         }
 
-        private string TextComboBox(ComboBox comboBox)
+        // Returneaza statusul ales in ComboBox sau Finalizata ca valoare de rezerva.
+        private string CitesteStatusSelectat()
         {
-            if (comboBox.SelectedItem is ComboBoxItem item && item.Content != null)
+            if (ComboStatus.SelectedItem is string status)
             {
-                return item.Content.ToString() ?? "";
+                return status;
             }
 
-            return "InCos";
-        }
-
-        private void SeteazaStatus(string status)
-        {
-            for (int i = 0; i < CmbStatus.Items.Count; i++)
-            {
-                if (CmbStatus.Items[i] is ComboBoxItem item && string.Equals(item.Content.ToString(), status, StringComparison.OrdinalIgnoreCase))
-                {
-                    CmbStatus.SelectedIndex = i;
-                    return;
-                }
-            }
-
-            CmbStatus.SelectedIndex = 0;
-        }
-
-        private class UtilizatorSelect
-        {
-            public int ID { get; set; }
-            public string Afisare { get; set; }
-
-            public UtilizatorSelect(int id, string afisare)
-            {
-                ID = id;
-                Afisare = afisare;
-            }
+            return GestionareComanda.Finalizata;
         }
     }
 }

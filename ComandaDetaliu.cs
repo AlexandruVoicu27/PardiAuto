@@ -12,6 +12,7 @@ namespace AutoPartsShop
         public decimal Pret { get; set; }
         public decimal Total { get; set; }
 
+      
         public ComandaDetaliu(Guid idComanda, DateTime dataComanda, string produs, string categorie, int cantitate, decimal pret)
         {
             IDComanda = idComanda;

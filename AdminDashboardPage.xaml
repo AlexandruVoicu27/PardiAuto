@@ -58,7 +58,7 @@
                 </Border>
                 <Border Style="{StaticResource Card}">
                     <StackPanel>
-                        <TextBlock Text="Stoc redus" Foreground="#718096"/>
+                        <TextBlock Text="Stoc redus (max. 10 buc.)" Foreground="#718096"/>
                         <TextBlock x:Name="TxtStocRedus" Text="0" FontSize="26" FontWeight="Bold" Foreground="#C05621"/>
                     </StackPanel>
                 </Border>

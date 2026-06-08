@@ -1,6 +1,6 @@
-using Microsoft.Data.SqlClient;
 using System;
-using System.Collections.Generic;
+using System.Data;
+using Microsoft.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,379 +8,227 @@ namespace AutoPartsShop
 {
     public partial class ConfigurareAngajatiPage : Page
     {
-        private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
-        private readonly Utilizator utilizatorCurent;
-        private readonly List<Utilizator> utilizatori = new List<Utilizator>();
+        private const string ConnectionString =
+            @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
 
+        private readonly Utilizator utilizatorCurent;
+
+        // Initializeaza pagina si limiteaza promovarea la administrator la utilizatorii administratori.
         public ConfigurareAngajatiPage(Utilizator utilizator)
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
-            CmbRol.SelectedIndex = 0;
-
-            if (utilizator.Rol == RolUtilizator.Angajat)
-            {
-                BtnPromoveazaAdministrator.Visibility = Visibility.Collapsed;
-            }
-            else if (utilizator.Rol == RolUtilizator.Administrator)
-            {
-                BtnPromoveazaAdministrator.Visibility = Visibility.Visible;
-            }
-
             IncarcaUtilizatori();
+
+            //daca e administrator, afiseaza butonul de promovare la administrator, altfel il ascunde
+            BtnPromoveazaAdministrator.Visibility =
+                utilizatorCurent.Rol == RolUtilizator.Administrator
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
         }
 
+        // Reincarca lista utilizatorilor din baza de date.
         private void BtnReincarcaUtilizatori_Click(object sender, RoutedEventArgs e)
         {
             IncarcaUtilizatori();
         }
 
-        private void BtnCreeazaUtilizator_Click(object sender, RoutedEventArgs e)
-        {
-            if (!ValideazaFormular(necesitaParola: true, out string nume, out string email, out string parola, out RolUtilizator rol))
-            {
-                return;
-            }
-
-            try
-            {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = @"
-INSERT INTO Utilizatori (NumeComplet, Email, ParolaHash, Rol)
-OUTPUT INSERTED.Id
-VALUES (@NumeComplet, @Email, @ParolaHash, @Rol)";
-
-                int idNou;
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@NumeComplet", nume);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@ParolaHash", Security.HashParola(parola));
-                    cmd.Parameters.AddWithValue("@Rol", rol.ToString());
-                    idNou = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-
-                using (SqlCommand cmd = new SqlCommand("INSERT INTO DateUtilizatori (UtilizatorId) VALUES (@UtilizatorId)", conn))
-                {
-                    cmd.Parameters.AddWithValue("@UtilizatorId", idNou);
-                    cmd.ExecuteNonQuery();
-                }
-
-                AppLogger.Scrie("Utilizator creat", "Administrator: " + utilizatorCurent.Email + ", utilizator: " + email + ", rol: " + rol);
-                CurataFormular();
-                IncarcaUtilizatori();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la crearea utilizatorului: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnActualizeazaUtilizator_Click(object sender, RoutedEventArgs e)
-        {
-            if (!SelecteazaUtilizator(out Utilizator utilizator))
-            {
-                return;
-            }
-
-            if (!ValideazaFormular(necesitaParola: false, out string nume, out string email, out string parola, out RolUtilizator rol))
-            {
-                return;
-            }
-
-            if (utilizator.ID == utilizatorCurent.ID && rol != utilizatorCurent.Rol)
-            {
-                MessageBox.Show("Nu iti schimba propriul rol din aceasta pagina.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            try
-            {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = string.IsNullOrWhiteSpace(parola)
-                    ? "UPDATE Utilizatori SET NumeComplet = @NumeComplet, Email = @Email, Rol = @Rol WHERE Id = @Id"
-                    : "UPDATE Utilizatori SET NumeComplet = @NumeComplet, Email = @Email, ParolaHash = @ParolaHash, Rol = @Rol WHERE Id = @Id";
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", utilizator.ID);
-                cmd.Parameters.AddWithValue("@NumeComplet", nume);
-                cmd.Parameters.AddWithValue("@Email", email);
-                cmd.Parameters.AddWithValue("@Rol", rol.ToString());
-
-                if (!string.IsNullOrWhiteSpace(parola))
-                {
-                    cmd.Parameters.AddWithValue("@ParolaHash", Security.HashParola(parola));
-                }
-
-                cmd.ExecuteNonQuery();
-
-                AppLogger.Scrie("Utilizator actualizat", "Administrator: " + utilizatorCurent.Email + ", utilizator: " + email + ", rol: " + rol);
-                CurataFormular();
-                IncarcaUtilizatori();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la actualizarea utilizatorului: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnStergeUtilizator_Click(object sender, RoutedEventArgs e)
-        {
-            if (!SelecteazaUtilizator(out Utilizator utilizator))
-            {
-                return;
-            }
-
-            if (utilizator.ID == utilizatorCurent.ID)
-            {
-                MessageBox.Show("Nu iti poti sterge propriul cont cat esti logat.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            if (MessageBox.Show("Sigur vrei sa stergi utilizatorul selectat? Se sterg si comenzile, platile si facturile lui.", "Confirmare", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-            {
-                return;
-            }
-
-            try
-            {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-                DbSchema.AsiguraSchema();
-                using SqlTransaction transaction = conn.BeginTransaction();
-
-                Executa(conn, transaction, "DELETE p FROM Plati p INNER JOIN Comanda c ON p.ID_Comanda = c.ID WHERE c.ID_Utilizator = @Id", utilizator.ID);
-                Executa(conn, transaction, "DELETE f FROM Facturi f INNER JOIN Comanda c ON f.ID_Comanda = c.ID WHERE c.ID_Utilizator = @Id", utilizator.ID);
-                Executa(conn, transaction, "DELETE cp FROM ComandaProduse cp INNER JOIN Comanda c ON cp.ID_Comanda = c.ID WHERE c.ID_Utilizator = @Id", utilizator.ID);
-                Executa(conn, transaction, "DELETE FROM Comanda WHERE ID_Utilizator = @Id", utilizator.ID);
-                Executa(conn, transaction, "DELETE FROM DateUtilizatori WHERE UtilizatorId = @Id", utilizator.ID);
-                Executa(conn, transaction, "DELETE FROM Utilizatori WHERE Id = @Id", utilizator.ID);
-
-                transaction.Commit();
-
-                AppLogger.Scrie("Utilizator sters", "Administrator: " + utilizatorCurent.Email + ", utilizator: " + utilizator.Email);
-                CurataFormular();
-                IncarcaUtilizatori();
-            }
-            catch (SqlException ex)
-            {
-                MessageBox.Show("Eroare la stergerea utilizatorului: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
+        // Schimba rolul utilizatorului selectat in Angajat.
         private void BtnPromoveazaAngajat_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaUtilizator(out Utilizator utilizator))
+            if (!SelecteazaUtilizator(out DataRowView utilizator))
             {
                 return;
             }
 
-            if (utilizator.Rol == RolUtilizator.Administrator)
+            if (utilizator["Rol"]?.ToString() == RolUtilizator.Angajat.ToString())
             {
-                MessageBox.Show("Rolul de administrator nu poate fi modificat de aici.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    "Utilizatorul selectat este deja angajat.",
+                    "Info",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+            if (utilizator["Rol"]?.ToString()==RolUtilizator.Administrator.ToString())
+            {
+                MessageBox.Show(
+                   "Utilizatorul selectat este Administrator.",
+                   "Info",
+                   MessageBoxButton.OK,
+                   MessageBoxImage.Information);
                 return;
             }
 
-            if (utilizator.Rol == RolUtilizator.Angajat)
-            {
-                MessageBox.Show("Utilizatorul este deja angajat.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            SchimbaRolUtilizator(utilizator, RolUtilizator.Angajat);
+            SchimbaRolUtilizator(
+                Convert.ToInt32(utilizator["ID"]),
+                RolUtilizator.Angajat.ToString());
         }
 
+        // Schimba rolul utilizatorului selectat in Client.
         private void BtnTransformaClient_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaUtilizator(out Utilizator utilizator))
+            if (!SelecteazaUtilizator(out DataRowView utilizator))
             {
                 return;
             }
 
-            if (utilizator.Rol == RolUtilizator.Administrator)
+            if (utilizator["Rol"]?.ToString() == RolUtilizator.Client.ToString())
             {
-                MessageBox.Show("Rolul de administrator nu poate fi modificat de aici.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    "Utilizatorul selectat este deja client.",
+                    "Info",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+
+            }
+            if (utilizator["Rol"]?.ToString() == RolUtilizator.Administrator.ToString())
+            {
+                MessageBox.Show(
+                   "Utilizatorul selectat este Administrator.",
+                   "Info",
+                   MessageBoxButton.OK,
+                   MessageBoxImage.Information);
                 return;
             }
 
-            if (utilizator.Rol == RolUtilizator.Client)
-            {
-                MessageBox.Show("Utilizatorul este deja client.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            SchimbaRolUtilizator(utilizator, RolUtilizator.Client);
+            SchimbaRolUtilizator(
+                Convert.ToInt32(utilizator["ID"]),
+                RolUtilizator.Client.ToString());
         }
 
+        // Schimba rolul utilizatorului selectat in Administrator.
         private void BtnPromoveazaAdministrator_Click(object sender, RoutedEventArgs e)
         {
-            if (!SelecteazaUtilizator(out Utilizator utilizator))
+            if (utilizatorCurent.Rol != RolUtilizator.Administrator)
+            {
+                MessageBox.Show(
+                    "Doar un administrator poate acorda rolul de administrator.",
+                    "Acces interzis",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!SelecteazaUtilizator(out DataRowView utilizator))
             {
                 return;
             }
 
-            if (utilizator.Rol == RolUtilizator.Administrator)
+            if (utilizator["Rol"]?.ToString() == RolUtilizator.Administrator.ToString())
             {
-                MessageBox.Show("Utilizatorul este deja administrator.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    "Utilizatorul selectat este deja administrator.",
+                    "Info",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
                 return;
             }
 
-            SchimbaRolUtilizator(utilizator, RolUtilizator.Administrator);
+            SchimbaRolUtilizator(
+                Convert.ToInt32(utilizator["ID"]),
+                RolUtilizator.Administrator.ToString());
         }
 
-        private void UtilizatoriGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        // Citeste utilizatorul selectat din tabel si afiseaza un mesaj daca nu exista selectie.
+        private bool SelecteazaUtilizator(out DataRowView utilizator)
         {
-            if (UtilizatoriGrid.SelectedItem is not Utilizator utilizator)
+            if (UtilizatoriGrid.SelectedItem is DataRowView randSelectat)
             {
-                return;
-            }
-
-            TxtNume.Text = utilizator.Nume;
-            TxtEmail.Text = utilizator.Email;
-            TxtParola.Clear();
-            SeteazaRol(utilizator.Rol);
-        }
-
-        private bool SelecteazaUtilizator(out Utilizator utilizator)
-        {
-            if (UtilizatoriGrid.SelectedItem is Utilizator utilizatorSelectat)
-            {
-                utilizator = utilizatorSelectat;
+                utilizator = randSelectat;
                 return true;
             }
 
-            utilizator = utilizatorCurent;
-            MessageBox.Show("Selecteaza un utilizator.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            utilizator = null!;
+            MessageBox.Show(
+                "Selecteaza un utilizator din lista.",
+                "Info",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
             return false;
         }
 
+        // Citeste toti utilizatorii din baza de date si ii afiseaza in tabel.
         private void IncarcaUtilizatori()
         {
             try
             {
-                utilizatori.Clear();
-
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
-
-                string query = "SELECT Id, NumeComplet, Email, Rol FROM Utilizatori ORDER BY Rol, NumeComplet";
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    int id = Convert.ToInt32(reader["Id"]);
-                    string nume = Convert.ToString(reader["NumeComplet"]) ?? "";
-                    string email = Convert.ToString(reader["Email"]) ?? "";
-                    string rolText = Convert.ToString(reader["Rol"]) ?? RolUtilizator.Client.ToString();
-                    RolUtilizator rol = (RolUtilizator)Enum.Parse(typeof(RolUtilizator), rolText);
+                    conn.Open();
 
-                    utilizatori.Add(Utilizator.CreateByRol(id, nume, email, rol));
+                    const string query = @"
+                        SELECT
+                            Id AS ID,
+                            NumeComplet AS Nume,
+                            Email,
+                            Rol
+                        FROM Utilizatori
+                        ORDER BY
+                            CASE Rol
+                                WHEN 'Administrator' THEN 1
+                                WHEN 'Angajat' THEN 2
+                                ELSE 3
+                            END,
+                            Nume";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+                        UtilizatoriGrid.ItemsSource = table.DefaultView;
+                    }
                 }
-
-                UtilizatoriGrid.ItemsSource = null;
-                UtilizatoriGrid.ItemsSource = utilizatori;
             }
             catch (SqlException ex)
             {
-                MessageBox.Show("Eroare la incarcarea utilizatorilor: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Eroare la incarcarea utilizatorilor: " + ex.Message,
+                    "Eroare SQL",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
-        private void SchimbaRolUtilizator(Utilizator utilizator, RolUtilizator rolNou)
+        // Actualizeaza rolul utilizatorului in baza de date si reincarca lista.
+        private void SchimbaRolUtilizator(int utilizatorId, string rolNou)
         {
             try
             {
-                using SqlConnection conn = new SqlConnection(ConnectionString);
-                conn.Open();
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
 
-                string query = "UPDATE Utilizatori SET Rol = @Rol WHERE Id = @Id";
+                    const string query = @"
+                        UPDATE Utilizatori
+                        SET Rol = @Rol
+                        WHERE Id = @ID";
 
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", utilizator.ID);
-                cmd.Parameters.AddWithValue("@Rol", rolNou.ToString());
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Rol", rolNou);
+                        cmd.Parameters.AddWithValue("@ID", utilizatorId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
-                cmd.ExecuteNonQuery();
-
-                AppLogger.Scrie("Rol utilizator modificat", "Administrator: " + utilizatorCurent.Email + ", utilizator: " + utilizator.Email + ", rol vechi: " + utilizator.Rol + ", rol nou: " + rolNou);
                 IncarcaUtilizatori();
+                MessageBox.Show(
+                    "Rolul utilizatorului a fost actualizat.",
+                    "Succes",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
             catch (SqlException ex)
             {
-                MessageBox.Show("Eroare la modificarea rolului: " + ex.Message, "Eroare SQL", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Eroare la actualizarea rolului: " + ex.Message,
+                    "Eroare SQL",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
-        }
-
-        private void Executa(SqlConnection conn, SqlTransaction transaction, string query, int id)
-        {
-            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
-            cmd.Parameters.AddWithValue("@Id", id);
-            cmd.ExecuteNonQuery();
-        }
-
-        private bool ValideazaFormular(bool necesitaParola, out string nume, out string email, out string parola, out RolUtilizator rol)
-        {
-            nume = TxtNume.Text.Trim();
-            email = TxtEmail.Text.Trim();
-            parola = TxtParola.Password;
-            rol = CitesteRolDinCombo();
-
-            if (string.IsNullOrWhiteSpace(nume) || string.IsNullOrWhiteSpace(email))
-            {
-                MessageBox.Show("Numele si emailul sunt obligatorii.", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (necesitaParola && string.IsNullOrWhiteSpace(parola))
-            {
-                MessageBox.Show("Parola este obligatorie pentru utilizator nou.", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (!email.Contains("@"))
-            {
-                MessageBox.Show("Emailul nu pare valid.", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
-        private RolUtilizator CitesteRolDinCombo()
-        {
-            if (CmbRol.SelectedItem is ComboBoxItem item && item.Content != null)
-            {
-                return (RolUtilizator)Enum.Parse(typeof(RolUtilizator), item.Content.ToString() ?? "Client");
-            }
-
-            return RolUtilizator.Client;
-        }
-
-        private void SeteazaRol(RolUtilizator rol)
-        {
-            for (int i = 0; i < CmbRol.Items.Count; i++)
-            {
-                if (CmbRol.Items[i] is ComboBoxItem item && item.Content != null && item.Content.ToString() == rol.ToString())
-                {
-                    CmbRol.SelectedIndex = i;
-                    return;
-                }
-            }
-
-            CmbRol.SelectedIndex = 0;
-        }
-
-        private void CurataFormular()
-        {
-            TxtNume.Clear();
-            TxtEmail.Clear();
-            TxtParola.Clear();
-            CmbRol.SelectedIndex = 0;
         }
     }
 }

@@ -55,8 +55,7 @@
                     <DataGridTextColumn Header="Total factura" Binding="{Binding TotalFactura, StringFormat={}{0:0.00} lei}" Width="110"/>
                     <DataGridTextColumn Header="Suma platita" Binding="{Binding SumaPlatita, StringFormat={}{0:0.00} lei}" Width="110"/>
                     <DataGridTextColumn Header="Metoda" Binding="{Binding Metoda}" Width="100"/>
-                    <DataGridTextColumn Header="Status plata" Binding="{Binding StatusPlata}" Width="110"/>
-                    <DataGridTextColumn Header="Status factura" Binding="{Binding StatusFactura}" Width="120"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
@@ -88,22 +87,17 @@
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Grid.Column="3">
-                        <TextBlock Text="Status plata" Foreground="#4A5568"/>
-                        <ComboBox x:Name="CmbStatusPlata" Height="34">
-                            <ComboBoxItem Content="InAsteptare"/>
-                            <ComboBoxItem Content="Platita"/>
-                            <ComboBoxItem Content="Esuata"/>
-                            <ComboBoxItem Content="Rambursata"/>
-                        </ComboBox>
+                        <TextBlock Text="Status" Foreground="#4A5568"/>
+                        <ComboBox x:Name="CmbStatusPlata" Height="34"/>
                     </StackPanel>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Genereaza factura" Click="BtnGenereazaFactura_Click" Style="{StaticResource ActionButton}" Background="#805AD5" Foreground="White"/>
-                    <Button Content="Inregistreaza plata" Click="BtnInregistreazaPlata_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
-                    <Button Content="Actualizeaza plata" Click="BtnActualizeazaPlata_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
-                    <Button Content="Sterge plata" Click="BtnStergePlata_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
+                    <Button Content="Genereaza factura" Click="BtnGenereazaFactura_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
+                    <Button Content="Inregistreaza plata" Click="BtnInregistreazaPlata_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                    <Button Content="Actualizeaza plata" Click="BtnActualizeazaPlata_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
                     <Button Content="Anuleaza factura" Click="BtnAnuleazaFactura_Click" Style="{StaticResource ActionButton}" Background="#718096" Foreground="White"/>
+                    <Button Content="Sterge plata" Click="BtnStergePlata_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
                 </StackPanel>
             </StackPanel>
         </Border>

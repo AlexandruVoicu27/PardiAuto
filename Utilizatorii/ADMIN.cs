@@ -11,6 +11,5 @@ namespace AutoPartsShop
         public ADMIN(int id,string nume, string email) : base(id,nume, email, RolUtilizator.Administrator)
         {
         }
-
     }
 }

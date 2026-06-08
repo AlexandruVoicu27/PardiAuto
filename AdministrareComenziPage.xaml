@@ -32,7 +32,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel>
                 <TextBlock Text="Administrare comenzi" FontSize="26" FontWeight="Bold" Foreground="#1A202C"/>
-                <TextBlock Text="CRUD comenzi: creare, actualizare status, stergere si generare factura." FontSize="14" Foreground="#718096"/>
+                <TextBlock Text="Actualizeaza statusul si observatiile, genereaza factura sau sterge comanda." FontSize="14" Foreground="#718096"/>
             </StackPanel>
             <Button Grid.Column="1" Content="Reincarca" Click="BtnReincarca_Click" Style="{StaticResource ActionButton}" Background="#2D3748" Foreground="White" VerticalAlignment="Center"/>
         </Grid>
@@ -61,41 +61,30 @@
             </DataGrid>
         </Border>
 
-        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,16,0,0">
+        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="16">
             <StackPanel>
+
                 <Grid Margin="0,0,0,12">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="160"/>
-                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="170"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                        <TextBlock Text="Client" Foreground="#4A5568"/>
-                        <ComboBox x:Name="CmbUtilizatori" Height="34" DisplayMemberPath="Afisare" SelectedValuePath="ID"/>
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Status" Foreground="#4A5568" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="CmbStatus" Height="34"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                        <TextBlock Text="Status" Foreground="#4A5568"/>
-                        <ComboBox x:Name="CmbStatus" Height="34">
-                            <ComboBoxItem Content="InCos"/>
-                            <ComboBoxItem Content="Finalizata"/>
-                            <ComboBoxItem Content="InProcesare"/>
-                            <ComboBoxItem Content="Livrata"/>
-                            <ComboBoxItem Content="Anulata"/>
-                            <ComboBoxItem Content="Achitata"/>
-                        </ComboBox>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Observatii" Foreground="#4A5568"/>
-                        <TextBox x:Name="TxtObservatii" Height="34"/>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Observatii" Foreground="#4A5568" Margin="0,0,0,4"/>
+                        <TextBox x:Name="TxtObservatii" Height="34" HorizontalAlignment="Stretch"/>
                     </StackPanel>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Creeaza comanda" Click="BtnCreeaza_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White"/>
-                    <Button Content="Actualizeaza" Click="BtnActualizeaza_Click" Style="{StaticResource ActionButton}" Background="#38A169" Foreground="White"/>
+                    <Button Content="Actualizeaza" Click="BtnActualizeaza_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White" Margin="0,0,10,0"/>
+                    <Button Content="Genereaza factura" Click="BtnGenereazaFactura_Click" Style="{StaticResource ActionButton}" Background="#3182CE" Foreground="White" Margin="0,0,10,0"/>
                     <Button Content="Sterge" Click="BtnSterge_Click" Style="{StaticResource ActionButton}" Background="#E53E3E" Foreground="White"/>
-                    <Button Content="Genereaza factura" Click="BtnGenereazaFactura_Click" Style="{StaticResource ActionButton}" Background="#805AD5" Foreground="White"/>
                 </StackPanel>
+
             </StackPanel>
         </Border>
     </Grid>

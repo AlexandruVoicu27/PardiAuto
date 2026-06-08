@@ -9,26 +9,27 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for PieseAutoPage.xaml
-    /// </summary>
-    /// 
+     
     public partial class PieseAutoPage : Page
     {
         private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
         private readonly Utilizator utilizatorCurent;
         private readonly List<Produs> produse = new List<Produs>();
 
+        // Deschide catalogul fara categorie si fara text de cautare.
         public PieseAutoPage(Utilizator utilizator)
             : this(utilizator, "", "")
         {
         }
 
+        // Deschide catalogul filtrat dupa categoria primita.
         public PieseAutoPage(Utilizator utilizator, string categorie)
             : this(utilizator, categorie, "")
         {
         }
 
+       
+        // Initializeaza catalogul, drepturile rolului si filtrele initiale.
         public PieseAutoPage(Utilizator utilizator, string categorie, string cautare)
         {
             InitializeComponent();
@@ -56,16 +57,19 @@ namespace AutoPartsShop
             IncarcaProduse();
         }
 
+        // Reciteste produsele din baza de date.
         private void BtnReincarca_Click(object sender, RoutedEventArgs e)
         {
             IncarcaProduse();
         }
 
+        // Aplica filtrele introduse in formular.
         private void BtnFiltreaza_Click(object sender, RoutedEventArgs e)
         {
             AplicaFiltre();
         }
 
+        // Reseteaza toate filtrele si reafiseaza catalogul complet.
         private void BtnReseteazaFiltre_Click(object sender, RoutedEventArgs e)
         {
             TxtCautaProdus.Clear();
@@ -78,17 +82,20 @@ namespace AutoPartsShop
             SchimbaTitluPagina();
         }
 
+        // Reaplica filtrele in timp real cand se modifica textul cautat.
         private void Filtru_TextChanged(object sender, TextChangedEventArgs e)
         {
             AplicaFiltre();
         }
 
+        // Reaplica filtrele si titlul cand se schimba o selectie.
         private void Filtru_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AplicaFiltre();
             SchimbaTitluPagina();
         }
 
+        // Valideaza formularul si adauga un produs nou in catalog.
         private void BtnAdauga_Click(object sender, RoutedEventArgs e)
         {
             if (!ValideazaProdus(out string nume, out decimal pret, out int cantitate))
@@ -126,6 +133,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Actualizeaza produsul selectat cu valorile din formular.
         private void BtnActualizeaza_Click(object sender, RoutedEventArgs e)
         {
             if (ProduseGrid.SelectedItem is not Produs produs)
@@ -175,6 +183,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Sterge produsul selectat daca acesta nu este blocat de relatii existente.
         private void BtnSterge_Click(object sender, RoutedEventArgs e)
         {
 
@@ -211,6 +220,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Valideaza cantitatea si adauga produsul selectat intr-o comanda noua din cos.
         private void BtnCumpara_Click(object sender, RoutedEventArgs e)
         {
             if (ProduseGrid.SelectedItem is not Produs produs)
@@ -242,8 +252,7 @@ namespace AutoPartsShop
             }
         }
 
-    //afiseaza toate datele in panoul adminului atunci cand vrei sa dai update 
-
+        // Completeaza formularul de administrare cu datele produsului selectat.
         private void IncarcaDetaliiProdus(object sender, SelectionChangedEventArgs e)
         {
             if (ProduseGrid.SelectedItem is not Produs produs)
@@ -257,8 +266,8 @@ namespace AutoPartsShop
             SeteazaCategorie(CmbCategorieProdus, produs.Categorie);
             TxtDescriereProdus.Text = produs.Descriere;
         }
-       
-        //incarca produsele in panoul de produse si le ordoneaza alfabetic
+
+        // Incarca toate produsele din baza de date, apoi aplica filtrele curente.
         private void IncarcaProduse()
         {
             try
@@ -298,6 +307,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Filtreaza lista in memorie dupa cautare, pret, categorie si disponibilitatea stocului.
         private void AplicaFiltre()
         {
             if (ProduseGrid == null)
@@ -369,27 +379,29 @@ namespace AutoPartsShop
             TxtNumarProduse.Text = "Produse afisate: " + produseFiltrate.Count;
         }
 
+        // Ordoneaza produsele filtrate dupa optiunea selectata de utilizator.
         private void SorteazaProduse(List<Produs> produseFiltrate)
         {
             //fcuntii lambda pentru a sorta dupa pret crescator, descrescator, stoc sau alfabetic
             if (CmbSortare.SelectedIndex == 1)
             {
-                produseFiltrate.Sort((p1, p2) => p1.Pret.CompareTo(p2.Pret));
+                produseFiltrate.Sort((p1, p2) => p1.Pret.CompareTo(p2.Pret));  //crescator
             }
             else if (CmbSortare.SelectedIndex == 2)
             {
-                produseFiltrate.Sort((p1, p2) => p2.Pret.CompareTo(p1.Pret));
+                produseFiltrate.Sort((p1, p2) => p2.Pret.CompareTo(p1.Pret));  //descrescator
             }
             else if (CmbSortare.SelectedIndex == 3)
             {
-                produseFiltrate.Sort((p1, p2) => p2.Cantitate.CompareTo(p1.Cantitate));
+                produseFiltrate.Sort((p1, p2) => p2.Cantitate.CompareTo(p1.Cantitate));  //stocul maxim 
             }
             else
             {
-                produseFiltrate.Sort((p1, p2) => string.Compare(p1.Nume, p2.Nume, StringComparison.OrdinalIgnoreCase));
+                produseFiltrate.Sort((p1, p2) => string.Compare(p1.Nume, p2.Nume,     StringComparison.OrdinalIgnoreCase));                                //alfabetic
             }
         }
 
+        // Returneaza textul elementului selectat intr-un ComboBox.
         private string TextComboBox(ComboBox comboBox)
         {
             if (comboBox.SelectedItem is ComboBoxItem item && item.Content != null)
@@ -400,6 +412,7 @@ namespace AutoPartsShop
             return "";
         }
 
+        // Selecteaza categoria primita sau prima optiune daca aceasta nu este gasita.
         private void SeteazaCategorie(ComboBox comboBox, string categorie)
         {
             if (string.IsNullOrWhiteSpace(categorie))
@@ -420,6 +433,7 @@ namespace AutoPartsShop
             comboBox.SelectedIndex = 0;
         }
 
+        // Actualizeaza titlul paginii in functie de categoria filtrata.
         private void SchimbaTitluPagina()
         {
             if (TxtTitluPagina == null || TxtDescrierePagina == null || CmbCategorieFiltru == null)
@@ -441,6 +455,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Creeaza comanda si detaliul ei, apoi scade stocul intr-o singura tranzactie.
         private void CumparaProdus(Guid produsId, int cantitateCumparata)
         { 
             
@@ -452,6 +467,8 @@ namespace AutoPartsShop
 
             try
             {
+                // Stocul este citit in aceeasi tranzactie pentru a valida cantitatea
+                // inainte de inserarea comenzii si de scaderea produselor.
                 string stocQuery = "SELECT Cantitate FROM Produs WHERE ID = @ID";
 
                 using SqlCommand stocCmd = new SqlCommand(stocQuery, conn, transaction);
@@ -507,7 +524,7 @@ namespace AutoPartsShop
             }
         }
 
-        //trateaza erori
+        // Valideaza numele, pretul si cantitatea introduse pentru un produs.
         private bool ValideazaProdus(out string nume, out decimal pret, out int cantitate)
         {
             nume = TxtNumeProdus.Text.Trim();
@@ -535,7 +552,7 @@ namespace AutoPartsShop
             return true;
         }
 
-        //pentru a da clear dupa ce introduci o piesa
+        // Goleste formularul de produs si elimina selectia curenta.
         private void CurataFormular()
         {
             TxtNumeProdus.Clear();

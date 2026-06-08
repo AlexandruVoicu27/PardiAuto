@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutoPartsShop
 {
+    
     public class CLIENT:Utilizator
     {
         public CLIENT(int id,string nume, string email) : base(id,nume, email, RolUtilizator.Client)

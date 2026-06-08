@@ -19,9 +19,6 @@ using System.Windows.Shapes;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for CreateAccountPage.xaml
-    /// </summary>
     public partial class CreateAccountPage : Page
     {
         public CreateAccountPage()
@@ -29,10 +26,13 @@ namespace AutoPartsShop
             InitializeComponent();
         }
 
+        
         private void BackToLogin_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GetNavigationService(this).Navigate(new LoginPage());
         }
+
+        // Valideaza datele introduse, hash-uieste parola si solicita salvarea contului.
         private void CreareCont_Click(object sender, RoutedEventArgs e)
         {
             string nume = NumeTextBox.Text;
@@ -47,7 +47,7 @@ namespace AutoPartsShop
                 return; 
             }
 
-            // 2. Verificam formatul de email cu Regex
+            // Verificam formatul de email cu Regex
             string emailPattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
             
             if (!Regex.IsMatch(email, emailPattern))
@@ -59,9 +59,9 @@ namespace AutoPartsShop
             //si adaugam in DB
 
             SalvareInBazaDeDate(nume, email, Security.HashParola(parola));
-            //TREBUIE ADAUGAT SA MA BAGE PE SITE AUTOMAT
         }
 
+        // Insereaza noul client in baza de date si trateaza emailurile duplicate.
         private void SalvareInBazaDeDate(string nume, string email, string parolaHash)
         {
             string connectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";

@@ -17,15 +17,15 @@ using System.Windows.Shapes;
 
 namespace AutoPartsShop
 {
-    /// <summary>
-    /// Interaction logic for ProfilUtilizator.xaml
-    /// </summary>
+   
     public partial class ProfilUtilizator : Page
     {
         private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
 
         private Utilizator utilizatorCurent;
 
+        
+        // Afiseaza datele utilizatorului si ascunde administrarea pentru clientii obisnuiti.
         public ProfilUtilizator(Utilizator utilizator)
         {
             InitializeComponent();
@@ -44,15 +44,18 @@ namespace AutoPartsShop
          
         }
 
+        // Handler rezervat pentru sectiunea de date personale.
         private void BtnDatePersonale_Click(object sender, RoutedEventArgs e)
         {
         }
 
+        // Deschide pagina de administrare a utilizatorilor.
         private void ConfigurareAngajati_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new ConfigurareAngajatiPage(utilizatorCurent));
         }
 
+        // Deschide dialogu de editare a telefonului si salveaza valoarea confirmata.
         private void EditNrTelefon_Click(object sender, RoutedEventArgs e)
         {
             EditINFO dialog = new EditINFO("Număr de Telefon", TxtTelefon.Text);
@@ -65,6 +68,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Deschide dialogul de editare a adresei si salveaza valoarea confirmata.
         private void AdresaLivrareEdit_Click(object sender, RoutedEventArgs e)
         {
             EditINFO dialog = new EditINFO("Adresă de Livrare", TxtAdresa.Text);
@@ -76,6 +80,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Incarca telefonul si adresa utilizatorului din baza de date.
         private void IncarcaDateContact()
         {
             try
@@ -103,6 +108,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Actualizeaza datele de contact existente sau creeaza randul daca lipseste.
         private void SalveazaDateContact()
         {
             try
@@ -111,6 +117,7 @@ namespace AutoPartsShop
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
 
+                // Upsert manual: UPDATE daca randul exista, altfel INSERT.
                 string query = @"
             IF EXISTS (SELECT 1 FROM DateUtilizatori WHERE UtilizatorId = @UtilizatorId)
             BEGIN

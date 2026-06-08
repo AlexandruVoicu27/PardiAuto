@@ -7,24 +7,30 @@ using System.Windows.Controls;
 
 namespace AutoPartsShop
 {
+
     public partial class AdminDashboardPage : Page
     {
         private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        private const int PragStocRedus = 10;
         private readonly Utilizator utilizatorCurent;
 
+       // Initializeaza dashboardul si incarca toate valorile din baza de date.
         public AdminDashboardPage(Utilizator utilizator)
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
-            DbSchema.AsiguraSchema();
             IncarcaDashboard();
         }
 
+     
+        // Reincarca indicatorii si tabelele dashboardului.
+       
         private void BtnReincarca_Click(object sender, RoutedEventArgs e)
         {
             IncarcaDashboard();
         }
 
+        // Salveaza in tabela Rapoarte o copie text a indicatorilor afisati in acel moment.
         private void BtnGenereazaRaport_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -51,6 +57,7 @@ namespace AutoPartsShop
             }
         }
 
+        // Incarca numerele sumarizate, venitul, produsele vandute si comenzile recente.
         private void IncarcaDashboard()
         {
             try
@@ -58,12 +65,29 @@ namespace AutoPartsShop
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
 
-                TxtTotalUtilizatori.Text = ScalarInt(conn, "SELECT COUNT(*) FROM Utilizatori").ToString();
-                TxtTotalProduse.Text = ScalarInt(conn, "SELECT COUNT(*) FROM Produs").ToString();
-                TxtStocRedus.Text = ScalarInt(conn, "SELECT COUNT(*) FROM Produs WHERE Cantitate <= 5").ToString();
-                TxtTotalComenzi.Text = ScalarInt(conn, "SELECT COUNT(*) FROM Comanda").ToString();
-                TxtFacturi.Text = ScalarInt(conn, "SELECT COUNT(*) FROM Facturi").ToString();
-                TxtVenit.Text = ScalarDecimal(conn, "SELECT ISNULL(SUM(Suma), 0) FROM Plati WHERE Status = 'Platita'").ToString("0.00") + " lei";
+                // Fiecare ExecuteScalar citeste o singura valoare agregata.
+                using SqlCommand cmdUtilizatori = new SqlCommand("SELECT COUNT(*) FROM Utilizatori", conn);
+                TxtTotalUtilizatori.Text = Convert.ToInt32(cmdUtilizatori.ExecuteScalar()).ToString();
+
+                using SqlCommand cmdProduse = new SqlCommand("SELECT COUNT(*) FROM Produs", conn);
+                TxtTotalProduse.Text = Convert.ToInt32(cmdProduse.ExecuteScalar()).ToString();
+
+                using SqlCommand cmdStoc = new SqlCommand("SELECT COUNT(*) FROM Produs WHERE Cantitate <= @PragStocRedus", conn);
+                cmdStoc.Parameters.AddWithValue("@PragStocRedus", PragStocRedus);
+                TxtStocRedus.Text = Convert.ToInt32(cmdStoc.ExecuteScalar()).ToString();
+                
+                using SqlCommand cmdComenzi = new SqlCommand("SELECT COUNT(*) FROM Comanda", conn);
+                TxtTotalComenzi.Text = Convert.ToInt32(cmdComenzi.ExecuteScalar()).ToString();
+
+                using SqlCommand cmdFacturi = new SqlCommand("SELECT COUNT(*) FROM Facturi", conn);
+                TxtFacturi.Text = Convert.ToInt32(cmdFacturi.ExecuteScalar()).ToString();
+
+                using SqlCommand cmdVenit = new SqlCommand(
+                    "SELECT ISNULL(SUM(Total), 0) FROM Comanda WHERE Status = 'Achitata'",
+                    conn);
+                // Venitul include o singura data fiecare comanda achitata, chiar daca are mai multe plati.
+                decimal venitIncasat = Convert.ToDecimal(cmdVenit.ExecuteScalar());
+                TxtVenit.Text = venitIncasat.ToString("0.00") + " lei";
 
                 TopProduseGrid.ItemsSource = IncarcaTopProduse(conn).DefaultView;
                 ComenziRecenteGrid.ItemsSource = IncarcaComenziRecente(conn).DefaultView;
@@ -75,20 +99,7 @@ namespace AutoPartsShop
             }
         }
 
-        private int ScalarInt(SqlConnection conn, string query)
-        {
-            using SqlCommand cmd = new SqlCommand(query, conn);
-            object? rezultat = cmd.ExecuteScalar();
-            return Convert.ToInt32(rezultat);
-        }
-
-        private decimal ScalarDecimal(SqlConnection conn, string query)
-        {
-            using SqlCommand cmd = new SqlCommand(query, conn);
-            object? rezultat = cmd.ExecuteScalar();
-            return Convert.ToDecimal(rezultat);
-        }
-
+       // Returneaza primele zece produse ordonate dupa cantitatea comandata.
         private DataTable IncarcaTopProduse(SqlConnection conn)
         {
             string query = @"
@@ -103,6 +114,7 @@ ORDER BY Cantitate DESC, Produs";
             return CitesteTabel(conn, query);
         }
 
+        // Returneaza ultimele zece comenzi impreuna cu clientul, statusul si totalul lor.
         private DataTable IncarcaComenziRecente(SqlConnection conn)
         {
             string query = @"
@@ -120,12 +132,14 @@ ORDER BY c.DataComanda DESC";
             return CitesteTabel(conn, query);
         }
 
+        // Returneaza ultimele douazeci de rapoarte generate.
         private DataTable IncarcaRapoarte(SqlConnection conn)
         {
             string query = "SELECT TOP 20 DataGenerare, TipRaport, Detalii FROM Rapoarte ORDER BY DataGenerare DESC";
             return CitesteTabel(conn, query);
         }
 
+        // Executa o interogare SELECT si transforma rezultatul intr-un DataTable pentru DataGrid.
         private DataTable CitesteTabel(SqlConnection conn, string query)
         {
             using SqlCommand cmd = new SqlCommand(query, conn);

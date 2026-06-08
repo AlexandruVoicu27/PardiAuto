@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AutoPartsShop
 {
+    /// <summary>
+    /// Modelul de baza pentru un utilizator autentificat.
+    /// </summary>
     public class Utilizator
     {
    
@@ -14,7 +17,7 @@ namespace AutoPartsShop
         public string Email { get; private set; }
         public RolUtilizator Rol { get; private set; }
 
-
+        
         public Utilizator(int id,string nume, string email, RolUtilizator rol)
         {
             ID = id;
@@ -23,8 +26,7 @@ namespace AutoPartsShop
             Rol = rol;
         }
 
-        //aici se stabilesc ce tip de utilizator se va crea in functie de rolul primit ca parametru
-
+        //este angajat? creeaza un obiect de tip ANGAJAT etc
         public static Utilizator CreateByRol(int id, string nume, string email, RolUtilizator rol)
         {
             return rol switch

@@ -2,6 +2,7 @@ using System;
 
 namespace AutoPartsShop
 {
+    // ID-urile si data platii pot lipsi atunci cand factura nu are inca nicio plata.
     public class PlataFactura
     {
         public Guid? IDPlata { get; set; }
@@ -14,10 +15,10 @@ namespace AutoPartsShop
         public decimal TotalFactura { get; set; }
         public decimal SumaPlatita { get; set; }
         public string Metoda { get; set; }
-        public string StatusPlata { get; set; }
-        public string StatusFactura { get; set; }
+        public string Status { get; set; }
 
-        public PlataFactura(Guid? idPlata, Guid? idFactura, Guid idComanda, string numarFactura, string client, DateTime dataComanda, DateTime? dataPlata, decimal totalFactura, decimal sumaPlatita, string metoda, string statusPlata, string statusFactura)
+        // Construieste randul afisat in tabelul Plati si facturi.
+        public PlataFactura(Guid? idPlata, Guid? idFactura, Guid idComanda, string numarFactura, string client, DateTime dataComanda, DateTime? dataPlata, decimal totalFactura, decimal sumaPlatita, string metoda, string status)
         {
             IDPlata = idPlata;
             IDFactura = idFactura;
@@ -29,8 +30,7 @@ namespace AutoPartsShop
             TotalFactura = totalFactura;
             SumaPlatita = sumaPlatita;
             Metoda = metoda;
-            StatusPlata = statusPlata;
-            StatusFactura = statusFactura;
+            Status = status;
         }
     }
 }

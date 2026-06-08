@@ -2,10 +2,11 @@ using System;
 
 namespace AutoPartsShop
 {
+    // Model folosit de tabelul din pagina Administrare comenzi.
+    // Grupeaza datele comenzii, clientului si facturii intr-un singur obiect afisabil.
     public class AdminComanda
     {
         public Guid ID { get; set; }
-        public int IDUtilizator { get; set; }
         public string Client { get; set; }
         public string Email { get; set; }
         public DateTime DataComanda { get; set; }
@@ -15,10 +16,10 @@ namespace AutoPartsShop
         public string Observatii { get; set; }
         public bool AreFactura { get; set; }
 
-        public AdminComanda(Guid id, int idUtilizator, string client, string email, DateTime dataComanda, string status, decimal total, int numarProduse, string observatii, bool areFactura)
+        // Construieste modelul unei comenzi citite din baza de date.
+        public AdminComanda(Guid id, string client, string email, DateTime dataComanda, string status, decimal total, int numarProduse, string observatii, bool areFactura)
         {
             ID = id;
-            IDUtilizator = idUtilizator;
             Client = client;
             Email = email;
             DataComanda = dataComanda;

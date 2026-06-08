@@ -26,6 +26,16 @@ CREATE TABLE Produs (
     CONSTRAINT CK_Produs_Cantitate CHECK (Cantitate >= 0)
 );
 
+IF COL_LENGTH('Comanda', 'Total') IS NULL
+BEGIN
+    ALTER TABLE Comanda ADD Total DECIMAL(10, 2) NOT NULL CONSTRAINT DF_Comanda_Total DEFAULT 0
+END;
+
+IF COL_LENGTH('Comanda', 'Observatii') IS NULL
+BEGIN
+    ALTER TABLE Comanda ADD Observatii NVARCHAR(500) NULL
+END;
+
 CREATE TABLE Comanda (
     ID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
     ID_Utilizator INT NOT NULL,
@@ -84,3 +94,8 @@ CREATE TABLE Rapoarte (
     CONSTRAINT FK_Rapoarte_Utilizatori
         FOREIGN KEY (GeneratDe) REFERENCES Utilizatori(Id)
 );
+
+
+    
+ 
+

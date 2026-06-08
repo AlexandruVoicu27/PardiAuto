@@ -6,25 +6,28 @@ using System.Windows.Controls;
 
 namespace AutoPartsShop
 {
+    // Afiseaza produsele din cosul clientului si permite finalizarea comenzii.
     public partial class ComandaMeaPage : Page
     {
         private const string ConnectionString = @"Server=(localdb)\MSSQLLocalDB;Database=PardiAutoDB;Trusted_Connection=True;TrustServerCertificate=True;";
         private readonly Utilizator utilizatorCurent;
         private readonly List<ComandaDetaliu> comenzi = new List<ComandaDetaliu>();
 
+        // Initializeaza pagina si incarca produsele din comenzile aflate in cos.
         public ComandaMeaPage(Utilizator utilizator)
         {
             InitializeComponent();
             utilizatorCurent = utilizator;
-            DbSchema.AsiguraSchema();
             IncarcaComenzi();
         }
 
+        // Reciteste produsele din cos.
         private void BtnReincarca_Click(object sender, RoutedEventArgs e)
         {
             IncarcaComenzi();
         }
 
+        // Finalizeaza comenzile din cos dupa verificarea produselor si a adresei de livrare.
         private void BtnFinalizeazaComanda_Click(object sender, RoutedEventArgs e)
         {
             if (comenzi.Count == 0)
@@ -44,6 +47,8 @@ namespace AutoPartsShop
                 using SqlConnection conn = new SqlConnection(ConnectionString);
                 conn.Open();
 
+                // Pentru fiecare comanda din cos se salveaza totalul calculat din produse
+                // si se schimba statusul in Finalizata.
                 string query = @"
 UPDATE c
 SET Status = 'Finalizata',
@@ -72,6 +77,7 @@ WHERE c.ID_Utilizator = @ID_Utilizator
             }
         }
 
+       // Citeste produsele din comenzile InCos ale utilizatorului curent.
         private void IncarcaComenzi()
         {
             try
@@ -119,6 +125,7 @@ WHERE c.ID_Utilizator = @ID_Utilizator
             }
         }
 
+        // Leaga lista de DataGrid si calculeaza totalul vizibil al cosului.
         private void AfiseazaComenzi()
         {
             decimal total = 0;
@@ -134,6 +141,7 @@ WHERE c.ID_Utilizator = @ID_Utilizator
             TxtTotalComenzi.Text = "Total: " + total.ToString("0.00") + " lei";
         }
 
+        // Verifica daca utilizatorul are o adresa de livrare completata.
         private bool AreAdresaLivrare()
         {
             using SqlConnection conn = new SqlConnection(ConnectionString);
@@ -144,8 +152,8 @@ WHERE c.ID_Utilizator = @ID_Utilizator
             using SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@UtilizatorId", utilizatorCurent.ID);
 
-            object? rezultat = cmd.ExecuteScalar();
-            string adresa = Convert.ToString(rezultat) ?? "";
+            object? rezultat = cmd.ExecuteScalar(); //poate sa fie si null
+            string adresa = Convert.ToString(rezultat) ?? ""; //daca e null introduce text gol
 
             return !string.IsNullOrWhiteSpace(adresa);
         }

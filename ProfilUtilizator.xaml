@@ -43,7 +43,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,0">
             <Button x:Name="BtnDatePersonale" Click="BtnDatePersonale_Click" Content="📝 Date personale" Style="{StaticResource ActiveTabButton}"/>
-            <Button x:Name="ConfigurareAngajati" Click="ConfigurareAngajati_Click" Content="👥 Configurare angajați" Style="{StaticResource TabButton}"/>
+            <Button x:Name="ConfigurareAngajati" Click="ConfigurareAngajati_Click" Content="👥 Configurare utilizatori" Style="{StaticResource TabButton}"/>
         </StackPanel>
 
         <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="4" Margin="20" Padding="20">
